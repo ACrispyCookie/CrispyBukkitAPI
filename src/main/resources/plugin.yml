@@ -1,0 +1,5 @@
+name: CrispyBaseBukkit
+version: '${project.version}'
+author: ACrispyCookie
+main: dev.acrispycookie.crispybasebukkit.CrispyBaseBukkit
+depend: []
