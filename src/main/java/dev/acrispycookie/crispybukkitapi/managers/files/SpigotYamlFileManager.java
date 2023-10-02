@@ -10,28 +10,19 @@ public class SpigotYamlFileManager extends DataFileManager {
 
     YamlConfiguration yaml;
 
-    public SpigotYamlFileManager(JavaPlugin plugin, String name, String directory) {
+    public SpigotYamlFileManager(JavaPlugin plugin, String name, String directory) throws IOException, InvalidConfigurationException {
         super(plugin, name, directory);
-
-        try {
-            yaml = new YamlConfiguration();
-            yaml.load(getFile());
-        } catch (InvalidConfigurationException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        yaml = new YamlConfiguration();
+        yaml.load(getFile());
     }
 
     public YamlConfiguration get() {
         return yaml;
     }
 
-    public void reload() {
+    public void reload() throws IOException, InvalidConfigurationException {
         super.reload();
-        try {
-            yaml = new YamlConfiguration();
-            yaml.load(getFile());
-        } catch (InvalidConfigurationException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        yaml = new YamlConfiguration();
+        yaml.load(getFile());
     }
 }

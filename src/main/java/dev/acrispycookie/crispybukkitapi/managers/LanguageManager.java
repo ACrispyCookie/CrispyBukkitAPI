@@ -6,7 +6,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.InvalidConfigurationException;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class LanguageManager extends BaseManager {
@@ -23,9 +25,14 @@ public class LanguageManager extends BaseManager {
         enabled = false;
     }
 
-    public void load() {
-        if(enabled)
-            this.yamlManager = new SpigotYamlFileManager(api.getPlugin(), "lang.yml", "");
+    public void load() throws ManagerLoadException {
+        if(enabled) {
+            try {
+                this.yamlManager = new SpigotYamlFileManager(api.getPlugin(), "lang.yml", "");
+            } catch (IOException | InvalidConfigurationException e) {
+                throw new ManagerLoadException(e);
+            }
+        }
     }
 
     public TextComponent get(String path) {
@@ -95,8 +102,11 @@ public class LanguageManager extends BaseManager {
     }
 
     @Override
-    public boolean reload() {
-        yamlManager.reload();
-        return false;
+    public void reload() throws ManagerReloadException {
+        try {
+            yamlManager.reload();
+        } catch (IOException | InvalidConfigurationException e) {
+            throw new ManagerReloadException(e, true, true);
+        }
     }
 }

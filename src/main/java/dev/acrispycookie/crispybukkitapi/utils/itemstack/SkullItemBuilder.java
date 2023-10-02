@@ -43,7 +43,7 @@ public class SkullItemBuilder extends ItemBuilder {
 
 	public ItemStack build() {
 		ItemStack i;
-		SkullMeta meta = null;
+		SkullMeta meta;
 		if(url != null) {
 			i = getSkull(url);
 			meta = (SkullMeta) i.getItemMeta();
@@ -56,19 +56,19 @@ public class SkullItemBuilder extends ItemBuilder {
 			}
 			else {
 		        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-		        profile.getProperties().put("textures", new Property("textures", new String(getBase64(uuid))));
+		        profile.getProperties().put("textures", new Property("textures", getBase64(uuid)));
 		        Field profileField = null;
 		        try {
 		            profileField = meta.getClass().getDeclaredField("profile");
 		        } catch (NoSuchFieldException | SecurityException e) {
-		            e.printStackTrace();
+					throw new RuntimeException(e);
 		        }
 		        profileField.setAccessible(true);
 		        try {
 		            profileField.set(meta, profile);
 		        } catch (IllegalArgumentException | IllegalAccessException e) {
-		            e.printStackTrace();
-		        }
+					throw new RuntimeException(e);
+				}
 			}
 		}
 		meta.setDisplayName(name);
@@ -128,17 +128,17 @@ public class SkullItemBuilder extends ItemBuilder {
 		GameProfile profile = new GameProfile(UUID.randomUUID(), null);
 		byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
 		profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
-		Field profileField = null;
+		Field profileField;
 		try {
 			profileField = skullMeta.getClass().getDeclaredField("profile");
 		} catch (NoSuchFieldException | SecurityException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		profileField.setAccessible(true);
 		try {
 			profileField.set(skullMeta, profile);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		skull.setItemMeta(skullMeta);
 		return skull;

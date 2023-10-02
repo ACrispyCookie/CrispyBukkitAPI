@@ -9,16 +9,18 @@ public class DatabaseManager extends BaseManager {
 
     private DatabaseMode mode;
     private Database db;
-    private boolean enabled = true;
+    private Database.DatabaseSchema schema = null;
 
     public DatabaseManager(CrispyBukkitAPI api) {
         super(api);
         this.mode = null;
     }
 
-    public void load() {
+    public void load() throws ManagerLoadException {
         if(!api.getManager(ConfigManager.class).hasDefault())
             return;
+        if(schema == null)
+            throw new ManagerLoadException("Database schema was not specified");
 
         this.mode = DatabaseMode.valueOf(getOptionValue(DatabaseOption.TYPE).toUpperCase());
         switch (mode) {
@@ -41,7 +43,7 @@ public class DatabaseManager extends BaseManager {
     }
 
     @Override
-    public boolean reload() {
+    public void reload() throws ManagerReloadException {
         if (mode == DatabaseMode.FLATFILE)
             ((JsonDatabase) db).reload();
         else {
@@ -55,8 +57,14 @@ public class DatabaseManager extends BaseManager {
                     getOptionValue(DatabaseOption.TABLE_PREFIX)
             );
         }
+    }
 
-        return false;
+    public void setSchema(Database.DatabaseSchema schema) {
+        this.schema = schema;
+    }
+
+    public DatabaseMode getMode() {
+        return mode;
     }
 
     private String getOptionValue(DatabaseOption option) {

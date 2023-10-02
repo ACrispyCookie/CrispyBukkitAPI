@@ -27,7 +27,7 @@ public class Hologram {
 	final ArrayList<EntityArmorStand> stands = new ArrayList<>();
 	Location loc;
 	boolean isHidden = false;
-	int ticks = -1;
+	final int ticks;
 	BukkitTask expire;
 	
 	public Hologram(CrispyBukkitAPI api, Collection<? extends Player> players, String text, Location loc, int ticks) {
@@ -102,9 +102,7 @@ public class Hologram {
 	
 	public void addPlayer(Player p) {
 		if(!isHidden) {
-			if(players.contains(p)) {
-				players.remove(p);
-			}
+			players.remove(p);
 			players.add(p);
 			for(EntityArmorStand eas : stands) {
 				if(eas != null) {

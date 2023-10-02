@@ -3,6 +3,7 @@ package dev.acrispycookie.crispybukkitapi;
 import dev.acrispycookie.crispybukkitapi.features.Feature;
 import dev.acrispycookie.crispybukkitapi.features.reload.ReloadFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
+import dev.acrispycookie.crispybukkitapi.managers.database.Database;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +31,7 @@ public final class CrispyBukkitAPI {
         return this;
     }
 
-    public CrispyBukkitAPI disableLanagauge() {
+    public CrispyBukkitAPI disableLanguage() {
         getManager(LanguageManager.class).disableDefault();
         return this;
     }
@@ -45,10 +46,25 @@ public final class CrispyBukkitAPI {
         return this;
     }
 
+    public CrispyBukkitAPI setDatabaseSchema(Database.DatabaseSchema schema) {
+        getManager(DatabaseManager.class).setSchema(schema);
+        return this;
+    }
+
     public void start() {
-        Arrays.stream(ManagerType.values()).forEach(t -> managers.get(t.getType()).load());
+        for (ManagerType t : ManagerType.values()) {
+            try {
+                managers.get(t.getType()).load();
+            } catch (BaseManager.ManagerLoadException e) {
+                plugin.getLogger().log(Level.SEVERE,
+                        "Couldn't load because this manager failed to load: " + t.name());
+                plugin.getLogger().log(Level.SEVERE,
+                        "Reason: " + e.getMessage());
+                return;
+            }
+        }
         plugin.getLogger().log(Level.INFO,
-                "Loaded plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) +"ms)");
+                "Loaded plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
     }
 
     public void stop() {
@@ -62,11 +78,25 @@ public final class CrispyBukkitAPI {
 
     public boolean reload() {
         AtomicBoolean restart = new AtomicBoolean(false);
-        Arrays.stream(ManagerType.values()).forEach(t -> {
-            if(managers.get(t.getType()).reload() && !restart.get()) {
-                restart.set(true);
+        for (ManagerType t : ManagerType.values()) {
+            try {
+                managers.get(t.getType()).reload();
+            } catch (BaseManager.ManagerReloadException e) {
+                if (e.stopLoading()) {
+                    getPlugin().getLogger().log(Level.SEVERE, "Couldn't reload because this manager failed to reload: " + t.name() + ".");
+                    getPlugin().getLogger().log(Level.SEVERE,
+                            "Reason: " + e.getMessage() + ". Fix it and restart the server.");
+                    return false;
+                }
+                if (e.requiresRestart()) {
+                    getPlugin().getLogger().log(Level.SEVERE, "This manager requires restarting: " + t.name());
+                    if (!restart.get())
+                        restart.set(e.requiresRestart());
+                }
             }
-        });
+        }
+        if(restart.get())
+            getPlugin().getLogger().log(Level.SEVERE, "RESTART REQUIRED! One or more features need restarting after reloading!");
         return restart.get();
     }
 

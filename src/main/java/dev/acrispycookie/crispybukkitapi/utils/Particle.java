@@ -8,14 +8,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Particle {
 
-	CrispyBukkitAPI api;
-	Effect effect;
-	float r = 0;
-	float g = 0;
-	float b = 0;
-	int data = 0;
-	Location loc;
-	BukkitRunnable runnable;
+	private final CrispyBukkitAPI api;
+	private Effect effect;
+	private float r = 0;
+	private float g = 0;
+	private float b = 0;
+	private int data;
+	private Location loc;
+	private BukkitRunnable runnable;
 	
 	public Particle(CrispyBukkitAPI api, Effect effect, int data, Location loc) {
 		this.api = api;

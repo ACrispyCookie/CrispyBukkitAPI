@@ -6,7 +6,6 @@ import dev.acrispycookie.crispybukkitapi.features.Feature;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 
 public class FeatureManager extends BaseManager {
 
@@ -23,15 +22,14 @@ public class FeatureManager extends BaseManager {
         toLoad.add(fClass);
     }
 
-    public void load() {
-        toLoad.forEach(fClass -> {
+    public void load() throws ManagerLoadException {
+        for (Class<? extends Feature> fClass : toLoad) {
             try {
                 features.add((Feature) fClass.getConstructors()[0].newInstance(api));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                api.getPlugin().getLogger().log(Level.SEVERE, "Couldn't create new instance of the feature: " + fClass.getName());
-                throw new RuntimeException(e);
+                throw new ManagerLoadException(e);
             }
-        });
+        }
     }
 
     public <T extends Feature> T getFeature(Class<T> tClass) {
@@ -53,7 +51,7 @@ public class FeatureManager extends BaseManager {
     }
 
     @Override
-    public boolean reload() {
+    public void reload() throws ManagerReloadException {
         AtomicBoolean restart = new AtomicBoolean(false);
         features.forEach(f -> {
             if(f.reload() && !restart.get()) {
@@ -62,8 +60,7 @@ public class FeatureManager extends BaseManager {
         });
 
         if(restart.get()) {
-            api.getPlugin().getLogger().log(Level.WARNING, "RESTART REQUIRED! One or more features need restarting after reloading!");
+            throw new ManagerReloadException("", restart.get(), false);
         }
-        return restart.get();
     }
 }

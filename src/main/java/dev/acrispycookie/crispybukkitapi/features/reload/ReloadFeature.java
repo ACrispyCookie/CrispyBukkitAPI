@@ -6,10 +6,7 @@ import dev.acrispycookie.crispybukkitapi.features.FeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.FeatureListener;
 import dev.acrispycookie.crispybukkitapi.features.reload.commands.ReloadCommand;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ReloadFeature extends Feature {
 
@@ -39,7 +36,7 @@ public class ReloadFeature extends Feature {
 
     @Override
     protected List<FeatureCommand<? extends Feature>> commandsToLoad() {
-        return Arrays.asList(new ReloadCommand(this, api));
+        return Collections.singletonList(new ReloadCommand(this, api));
     }
 
     @Override

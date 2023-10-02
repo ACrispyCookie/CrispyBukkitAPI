@@ -6,7 +6,9 @@ import dev.acrispycookie.crispybukkitapi.utils.itemstack.ItemStackBuilder;
 import dev.acrispycookie.crispybukkitapi.utils.itemstack.SkullItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +55,14 @@ public class ConfigManager extends BaseManager {
         toLoad.add(info);
     }
 
-    public void load() {
-        toLoad.forEach(info -> configs.put(info, new SpigotYamlFileManager(api.getPlugin(), info.getFile(), info.getDirectory())));
+    public void load() throws ManagerLoadException {
+        for(ConfigInfo info : toLoad) {
+            try {
+                configs.put(info, new SpigotYamlFileManager(api.getPlugin(), info.getFile(), info.getDirectory()));
+            } catch (IOException | InvalidConfigurationException e) {
+                throw new ManagerLoadException(e);
+            }
+        }
     }
 
     public boolean hasDefault() {
@@ -182,7 +190,7 @@ public class ConfigManager extends BaseManager {
         SKULL_BUILDER
     }
 
-    public class ConfigInfo {
+    public static class ConfigInfo {
         private final String file;
         private final String directory;
 
@@ -207,8 +215,13 @@ public class ConfigManager extends BaseManager {
     }
 
     @Override
-    public boolean reload() {
-        configs.values().forEach(SpigotYamlFileManager::reload);
-        return false;
+    public void reload() throws ManagerReloadException {
+        for (ConfigInfo i : configs.keySet()) {
+            try {
+                configs.get(i).reload();
+            } catch (IOException | InvalidConfigurationException e) {
+                throw new ManagerReloadException(e, true, true);
+            }
+        }
     }
 }

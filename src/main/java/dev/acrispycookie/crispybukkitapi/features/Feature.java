@@ -119,7 +119,7 @@ public abstract class Feature {
     }
 
     public class FeatureMessage {
-        String path;
+        private final String path;
         public FeatureMessage(String path) {
             this.path = path;
         }
@@ -151,7 +151,7 @@ public abstract class Feature {
     }
 
     protected class FeaturePermission {
-        String path;
+        private final String path;
         public FeaturePermission(String path) {
             this.path = path;
         }
@@ -166,7 +166,7 @@ public abstract class Feature {
     }
 
     protected class FeatureOption {
-        FeatureOptionInfo info;
+        private final FeatureOptionInfo info;
         public FeatureOption(FeatureOptionInfo info) {
             this.info = info;
         }

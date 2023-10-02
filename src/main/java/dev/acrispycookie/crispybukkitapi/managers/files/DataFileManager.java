@@ -1,12 +1,14 @@
 package dev.acrispycookie.crispybukkitapi.managers.files;
 
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 
 public abstract class DataFileManager {
 
-    private JavaPlugin plugin = null;
+    private final JavaPlugin plugin;
     private final String name;
     private final String directory;
     private File file;
@@ -36,7 +38,7 @@ public abstract class DataFileManager {
         this.file = file;
     }
 
-    public void reload() {
+    public void reload() throws IOException, InvalidConfigurationException {
         loadFile();
     }
 
