@@ -1,7 +1,7 @@
 package dev.acrispycookie.crispybukkitapi.features.reload.commands;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import dev.acrispycookie.crispybukkitapi.features.FeatureCommand;
+import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.reload.ReloadFeature;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReloadCommand extends FeatureCommand<ReloadFeature> {
+public class ReloadCommand extends CrispyFeatureCommand<ReloadFeature> {
 
     public ReloadCommand(ReloadFeature feature, CrispyBukkitAPI api) {
         super(feature, api, api.getPlugin().getName(), "Reloads the plugin configuration and data.");

@@ -14,6 +14,14 @@ public class ItemStackNBT {
 		nmsItem.setTag(tag);
 		return CraftItemStack.asBukkitCopy(nmsItem);
 	}
+
+	public static ItemStack removeTag(ItemStack i, String identifier) {
+		net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(i);
+		NBTTagCompound tag = nmsItem.hasTag() ? nmsItem.getTag() : new NBTTagCompound();
+		tag.remove(identifier);
+		nmsItem.setTag(tag);
+		return CraftItemStack.asBukkitCopy(nmsItem);
+	}
 	
 	public static NBTBase getTag(ItemStack i, String identifier) {
 		net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(i);

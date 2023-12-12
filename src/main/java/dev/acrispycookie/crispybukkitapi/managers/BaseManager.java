@@ -1,6 +1,7 @@
 package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
+import dev.acrispycookie.crispybukkitapi.database.Database;
 
 public abstract class BaseManager {
 

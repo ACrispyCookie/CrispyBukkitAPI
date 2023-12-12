@@ -1,11 +1,13 @@
 package dev.acrispycookie.crispybukkitapi;
 
-import dev.acrispycookie.crispybukkitapi.features.Feature;
+import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.reload.ReloadFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
-import dev.acrispycookie.crispybukkitapi.managers.database.Database;
+import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,13 +43,13 @@ public final class CrispyBukkitAPI {
         return this;
     }
 
-    public CrispyBukkitAPI addFeature(Class<? extends Feature> feature) {
-        getManager(FeatureManager.class).registerFeature(feature);
+    public CrispyBukkitAPI setDatabaseSchema(DatabaseSchema schema) {
+        getManager(DataManager.class).setSchema(schema);
         return this;
     }
 
-    public CrispyBukkitAPI setDatabaseSchema(Database.DatabaseSchema schema) {
-        getManager(DatabaseManager.class).setSchema(schema);
+    public CrispyBukkitAPI addFeature(Class<? extends CrispyFeature> feature) {
+        getManager(FeatureManager.class).registerFeature(feature);
         return this;
     }
 
@@ -56,10 +58,13 @@ public final class CrispyBukkitAPI {
             try {
                 managers.get(t.getType()).load();
             } catch (BaseManager.ManagerLoadException e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
                 plugin.getLogger().log(Level.SEVERE,
                         "Couldn't load because this manager failed to load: " + t.name());
                 plugin.getLogger().log(Level.SEVERE,
-                        "Reason: " + e.getMessage());
+                        "Reason: " + sw);
                 return;
             }
         }
@@ -83,9 +88,12 @@ public final class CrispyBukkitAPI {
                 managers.get(t.getType()).reload();
             } catch (BaseManager.ManagerReloadException e) {
                 if (e.stopLoading()) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
                     getPlugin().getLogger().log(Level.SEVERE, "Couldn't reload because this manager failed to reload: " + t.name() + ".");
                     getPlugin().getLogger().log(Level.SEVERE,
-                            "Reason: " + e.getMessage() + ". Fix it and restart the server.");
+                            "Reason: " + sw + "\n Fix it and restart the server.");
                     return false;
                 }
                 if (e.requiresRestart()) {
@@ -118,7 +126,7 @@ public final class CrispyBukkitAPI {
     public enum ManagerType {
         CONFIG(ConfigManager.class),
         LANGUAGE(LanguageManager.class),
-        DATABASE(DatabaseManager.class),
+        DATABASE(DataManager.class),
         FEATURE(FeatureManager.class);
 
         private final Class<? extends BaseManager> type;

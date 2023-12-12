@@ -1,16 +1,15 @@
 package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import dev.acrispycookie.crispybukkitapi.features.Feature;
+import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FeatureManager extends BaseManager {
 
-    private final ArrayList<Feature> features;
-    private final ArrayList<Class<? extends Feature>> toLoad;
+    private final ArrayList<CrispyFeature> features;
+    private final ArrayList<Class<? extends CrispyFeature>> toLoad;
 
     public FeatureManager(CrispyBukkitAPI api) {
         super(api);
@@ -18,22 +17,22 @@ public class FeatureManager extends BaseManager {
         this.toLoad = new ArrayList<>();
     }
 
-    public void registerFeature(Class<? extends Feature> fClass) {
+    public void registerFeature(Class<? extends CrispyFeature> fClass) {
         toLoad.add(fClass);
     }
 
     public void load() throws ManagerLoadException {
-        for (Class<? extends Feature> fClass : toLoad) {
+        for (Class<? extends CrispyFeature> fClass : toLoad) {
             try {
-                features.add((Feature) fClass.getConstructors()[0].newInstance(api));
+                features.add((CrispyFeature) fClass.getConstructors()[0].newInstance(api));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new ManagerLoadException(e);
             }
         }
     }
 
-    public <T extends Feature> T getFeature(Class<T> tClass) {
-        for (Feature f : features) {
+    public <T extends CrispyFeature> T getFeature(Class<T> tClass) {
+        for (CrispyFeature f : features) {
             if(tClass.equals(f.getClass())) {
                 return tClass.cast(f);
             }
@@ -43,7 +42,7 @@ public class FeatureManager extends BaseManager {
 
     public int getEnabledFeatures() {
         int count = 0;
-        for (Feature f : features) {
+        for (CrispyFeature f : features) {
             if(f.isEnabled())
                 count++;
         }
@@ -52,15 +51,19 @@ public class FeatureManager extends BaseManager {
 
     @Override
     public void reload() throws ManagerReloadException {
-        AtomicBoolean restart = new AtomicBoolean(false);
-        features.forEach(f -> {
-            if(f.reload() && !restart.get()) {
-                restart.set(true);
+        boolean restart = false;
+        for (CrispyFeature f : features) {
+            try {
+                if(f.reload() && !restart) {
+                    restart = true;
+                }
+            } catch (Exception e) {
+                throw new ManagerReloadException(e, true, true);
             }
-        });
+        }
 
-        if(restart.get()) {
-            throw new ManagerReloadException("", restart.get(), false);
+        if(restart) {
+            throw new ManagerReloadException("", restart, false);
         }
     }
 }

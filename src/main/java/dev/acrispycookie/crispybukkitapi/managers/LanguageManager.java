@@ -1,7 +1,7 @@
 package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import dev.acrispycookie.crispybukkitapi.managers.files.SpigotYamlFileManager;
+import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;

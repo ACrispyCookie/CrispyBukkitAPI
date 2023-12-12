@@ -1,7 +1,7 @@
 package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import dev.acrispycookie.crispybukkitapi.managers.files.SpigotYamlFileManager;
+import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
 import dev.acrispycookie.crispybukkitapi.utils.itemstack.ItemStackBuilder;
 import dev.acrispycookie.crispybukkitapi.utils.itemstack.SkullItemBuilder;
 import org.bukkit.Material;
@@ -44,6 +44,10 @@ public class ConfigManager extends BaseManager {
             case SKULL_BUILDER: return type.cast(getSkullBuilder(config, path));
         }
         return null;
+    }
+
+    public boolean hasPath(ConfigInfo config, String path) {
+        return configs.get(config).get().contains(path);
     }
 
     public void disableDefault() {

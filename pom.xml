@@ -71,6 +71,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>dev.acrispycookie</groupId>
+            <artifactId>CrispyCommons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>LATEST</version>
