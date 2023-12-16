@@ -88,7 +88,10 @@ public abstract class CrispyFeature {
             return false;
         }
 
+        unload();
         if (onReload()) {
+            loadCommands();
+            loadListeners();
             api.getPlugin().getLogger().log(Level.INFO, "Feature \"" + getName() + "\" was reloaded successfully");
             return false;
         } else {
