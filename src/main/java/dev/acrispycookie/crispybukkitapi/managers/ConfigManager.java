@@ -2,8 +2,9 @@ package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
-import dev.acrispycookie.crispybukkitapi.utils.itemstack.ItemStackBuilder;
-import dev.acrispycookie.crispybukkitapi.utils.itemstack.SkullItemBuilder;
+import dev.acrispycookie.crispycommons.implementations.itemstack.CrispyItemStack;
+import dev.acrispycookie.crispycommons.implementations.itemstack.implementations.CrispyHeadItem;
+import dev.acrispycookie.crispycommons.implementations.itemstack.implementations.CrispyPlayerHeadItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class ConfigManager extends BaseManager {
 
@@ -143,12 +145,12 @@ public class ConfigManager extends BaseManager {
         return configs.get(config).get().getConfigurationSection(path);
     }
 
-    private ItemStackBuilder getItemBuilder(ConfigInfo config, String path){
+    private CrispyItemStack getItemBuilder(ConfigInfo config, String path){
         if(!configs.get(config).get().isConfigurationSection(path))
             throw new InvalidTypeException("Value at " + path + " is not an item.");
 
         ConfigurationSection section = getSection(config, path);
-        ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.valueOf(section.getString("material")));
+        CrispyItemStack itemStackBuilder = new CrispyItemStack(Material.valueOf(section.getString("material")));
         itemStackBuilder.durability((short) section.getInt("data"));
         itemStackBuilder.amount(section.getInt("amount"));
         itemStackBuilder.glint(section.getBoolean("enchanted"));
@@ -162,12 +164,12 @@ public class ConfigManager extends BaseManager {
         return itemStackBuilder;
     }
 
-    private SkullItemBuilder getSkullBuilder(ConfigInfo config, String path){
+    private CrispyHeadItem getSkullBuilder(ConfigInfo config, String path){
         if(!configs.get(config).get().isConfigurationSection(path))
             throw new InvalidTypeException("Value at " + path + " is not an item.");
 
         ConfigurationSection section = getSection(config, path);
-        SkullItemBuilder itemStackBuilder = new SkullItemBuilder();
+        CrispyHeadItem itemStackBuilder = new CrispyPlayerHeadItem(UUID.fromString(section.getString("owner")));
         itemStackBuilder.amount(section.getInt("amount"));
         itemStackBuilder.name(section.getString("name"));
         StringBuilder lore = new StringBuilder();
