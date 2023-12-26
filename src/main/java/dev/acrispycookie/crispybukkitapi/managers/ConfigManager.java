@@ -2,9 +2,9 @@ package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
-import dev.acrispycookie.crispycommons.implementations.itemstack.CrispyItemStack;
-import dev.acrispycookie.crispycommons.implementations.itemstack.implementations.CrispyHeadItem;
-import dev.acrispycookie.crispycommons.implementations.itemstack.implementations.CrispyPlayerHeadItem;
+import dev.acrispycookie.crispycommons.implementations.wrappers.itemstack.CrispyItemStack;
+import dev.acrispycookie.crispycommons.implementations.wrappers.itemstack.implementations.CrispyHeadItem;
+import dev.acrispycookie.crispycommons.implementations.wrappers.itemstack.implementations.CrispyPlayerHeadItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
