@@ -49,6 +49,8 @@ public class DataManager extends BaseManager {
     @Override
     public void reload() throws ManagerReloadException {
         try {
+            if (mode == null)
+                return;
             db.reload(getLoadData());
         } catch (Database.DatabaseException e) {
             throw new ManagerReloadException(e, true, true);
