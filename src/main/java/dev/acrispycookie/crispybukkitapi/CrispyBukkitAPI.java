@@ -4,7 +4,10 @@ import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.reload.ReloadFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
+import dev.acrispycookie.crispycommons.implementations.CommonsSettings;
 import dev.acrispycookie.crispycommons.implementations.CrispyCommons;
+import dev.acrispycookie.crispycommons.implementations.guis.books.CrispyBookImpl;
+import dev.acrispycookie.crispycommons.implementations.guis.books.actions.BookActionCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.PrintWriter;
@@ -21,11 +24,11 @@ public final class CrispyBukkitAPI {
     private final long beforeLoading;
     private final HashMap<Class<? extends BaseManager>, BaseManager> managers;
 
-    public CrispyBukkitAPI(JavaPlugin plugin) {
+    public CrispyBukkitAPI(JavaPlugin plugin, CommonsSettings settings) {
         this.plugin = plugin;
         this.managers = new HashMap<>();
         beforeLoading = System.currentTimeMillis();
-        CrispyCommons.init(plugin);
+        CrispyCommons.init(plugin, settings);
         initManagers();
         addFeature(ReloadFeature.class);
     }
