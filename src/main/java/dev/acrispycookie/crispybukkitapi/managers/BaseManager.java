@@ -1,7 +1,6 @@
 package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import dev.acrispycookie.crispybukkitapi.database.Database;
 
 public abstract class BaseManager {
 
@@ -12,6 +11,7 @@ public abstract class BaseManager {
     }
 
     public abstract void load() throws ManagerLoadException;
+    public abstract void unload();
 
     public abstract void reload() throws ManagerReloadException;
 

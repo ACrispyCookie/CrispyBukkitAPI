@@ -6,22 +6,18 @@ import dev.acrispycookie.crispybukkitapi.managers.*;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
 import dev.acrispycookie.crispycommons.implementations.CommonsSettings;
 import dev.acrispycookie.crispycommons.implementations.CrispyCommons;
-import dev.acrispycookie.crispycommons.implementations.guis.books.CrispyBookImpl;
-import dev.acrispycookie.crispycommons.implementations.guis.books.actions.BookActionCommand;
+import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 public final class CrispyBukkitAPI {
 
     private final JavaPlugin plugin;
-    private final long beforeLoading;
+    private long beforeLoading;
     private final HashMap<Class<? extends BaseManager>, BaseManager> managers;
 
     public CrispyBukkitAPI(JavaPlugin plugin, CommonsSettings settings) {
@@ -63,22 +59,15 @@ public final class CrispyBukkitAPI {
             try {
                 managers.get(t.getType()).load();
             } catch (BaseManager.ManagerLoadException e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                plugin.getLogger().log(Level.SEVERE,
-                        "Couldn't load because this manager failed to load: " + t.name());
-                plugin.getLogger().log(Level.SEVERE,
-                        "Reason: " + sw);
+                CrispyLogger.printException(plugin, e, "Couldn't load because this manager failed to load: " + t.name());
                 return;
             }
         }
-        plugin.getLogger().log(Level.INFO,
-                "Loaded plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
+        CrispyLogger.log(plugin, Level.INFO, "Loaded plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
     }
 
     public void stop() {
-        plugin.getLogger().log(Level.INFO, "Goodbye!");
+        CrispyLogger.log(plugin, Level.INFO, "Goodbye!");
     }
 
 
@@ -87,30 +76,28 @@ public final class CrispyBukkitAPI {
     }
 
     public boolean reload() {
-        AtomicBoolean restart = new AtomicBoolean(false);
+        beforeLoading = System.currentTimeMillis();
+        boolean restart = false;
         for (ManagerType t : ManagerType.values()) {
             try {
                 managers.get(t.getType()).reload();
             } catch (BaseManager.ManagerReloadException e) {
                 if (e.stopLoading()) {
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    e.printStackTrace(pw);
-                    getPlugin().getLogger().log(Level.SEVERE, "Couldn't reload because this manager failed to reload: " + t.name() + ".");
-                    getPlugin().getLogger().log(Level.SEVERE,
-                            "Reason: " + sw + "\n Fix it and restart the server.");
+                    CrispyLogger.printException(plugin, e, "Couldn't reload because this manager failed to reload: " + t.name() + ".");
+                    CrispyLogger.log(plugin, Level.SEVERE, "Fix it and restart the server.");
                     return false;
                 }
                 if (e.requiresRestart()) {
-                    getPlugin().getLogger().log(Level.SEVERE, "This manager requires restarting: " + t.name());
-                    if (!restart.get())
-                        restart.set(e.requiresRestart());
+                    CrispyLogger.log(plugin, Level.WARNING, "This manager requires restarting: " + t.name());
+                    if (!restart)
+                        restart = e.requiresRestart();
                 }
             }
         }
-        if(restart.get())
-            getPlugin().getLogger().log(Level.SEVERE, "RESTART REQUIRED! One or more features need restarting after reloading!");
-        return restart.get();
+        if(restart)
+            CrispyLogger.log(plugin, Level.WARNING, "RESTART REQUIRED! One or more features need restarting after reloading!");
+        CrispyLogger.log(plugin, Level.INFO, "Finished reloading plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
+        return restart;
     }
 
     public JavaPlugin getPlugin() {

@@ -71,6 +71,12 @@ public class ConfigManager extends BaseManager {
         }
     }
 
+    public void unload() {
+        configs.clear();
+        toLoad.clear();
+        defaultConfig = null;
+    }
+
     public boolean hasDefault() {
         return defaultConfig != null;
     }

@@ -35,6 +35,10 @@ public class LanguageManager extends BaseManager {
         }
     }
 
+    public void unload() {
+        yamlManager = null;
+    }
+
     public TextComponent get(String path) {
         if(!yamlManager.get().isConfigurationSection(path))
             return new TextComponent(translate(buildListString(path)));

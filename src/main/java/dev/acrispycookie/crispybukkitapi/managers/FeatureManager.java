@@ -31,6 +31,12 @@ public class FeatureManager extends BaseManager {
         }
     }
 
+    public void unload() {
+        for (CrispyFeature f : features) {
+            f.unload();
+        }
+    }
+
     public <T extends CrispyFeature> T getFeature(Class<T> tClass) {
         for (CrispyFeature f : features) {
             if(tClass.equals(f.getClass())) {

@@ -75,7 +75,7 @@ public abstract class CrispyFeature {
         return missing;
     }
 
-    private void unload() {
+    public void unload() {
         commands.forEach(CrispyFeatureCommand::unregister);
         listeners.forEach(HandlerList::unregisterAll);
         commands.clear();

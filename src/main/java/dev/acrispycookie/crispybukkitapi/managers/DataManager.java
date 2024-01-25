@@ -46,6 +46,10 @@ public class DataManager extends BaseManager {
         }
     }
 
+    public void unload() {
+        // Should fix for SQL dbs
+    }
+
     @Override
     public void reload() throws ManagerReloadException {
         try {
