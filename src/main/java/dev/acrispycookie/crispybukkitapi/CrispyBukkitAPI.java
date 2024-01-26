@@ -4,8 +4,8 @@ import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.reload.ReloadFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
-import dev.acrispycookie.crispycommons.implementations.CommonsSettings;
-import dev.acrispycookie.crispycommons.implementations.CrispyCommons;
+import dev.acrispycookie.crispycommons.CommonsSettings;
+import dev.acrispycookie.crispycommons.CrispyCommons;
 import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
 import org.bukkit.plugin.java.JavaPlugin;
 
