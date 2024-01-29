@@ -4,7 +4,7 @@ import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
 import dev.acrispycookie.crispycommons.api.wrappers.itemstack.CrispyHeadItem;
 import dev.acrispycookie.crispycommons.api.wrappers.itemstack.CrispyItemStack;
-import dev.acrispycookie.crispycommons.implementations.wrappers.itemstack.CrispyPlayerHeadItem;
+import dev.acrispycookie.crispycommons.implementations.wrappers.itemstack.PlayerHeadItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -175,7 +175,7 @@ public class ConfigManager extends BaseManager {
             throw new InvalidTypeException("Value at " + path + " is not an item.");
 
         ConfigurationSection section = getSection(config, path);
-        CrispyHeadItem itemStackBuilder = new CrispyPlayerHeadItem(UUID.fromString(section.getString("owner")));
+        CrispyHeadItem itemStackBuilder = new PlayerHeadItem(UUID.fromString(section.getString("owner")));
         itemStackBuilder.amount(section.getInt("amount"));
         itemStackBuilder.name(section.getString("name"));
         StringBuilder lore = new StringBuilder();
