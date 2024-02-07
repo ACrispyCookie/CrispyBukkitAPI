@@ -199,7 +199,8 @@ public class ConfigManager extends BaseManager {
         STRING_LIST,
         SECTION,
         ITEM_BUILDER,
-        SKULL_BUILDER
+        SKULL_BUILDER,
+        INVENTORY_BUILDER
     }
 
     public static class ConfigInfo {
