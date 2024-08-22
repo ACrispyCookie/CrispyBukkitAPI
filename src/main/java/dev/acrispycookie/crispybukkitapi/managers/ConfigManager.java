@@ -1,11 +1,11 @@
 package dev.acrispycookie.crispybukkitapi.managers;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
 import dev.acrispycookie.crispycommons.api.itemstack.CrispyHeadItem;
 import dev.acrispycookie.crispycommons.api.itemstack.CrispyItemStack;
 import dev.acrispycookie.crispycommons.implementations.itemstack.PlayerHeadItem;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 
@@ -156,7 +156,7 @@ public class ConfigManager extends BaseManager {
             throw new InvalidTypeException("Value at " + path + " is not an item.");
 
         ConfigurationSection section = getSection(config, path);
-        CrispyItemStack itemStackBuilder = new CrispyItemStack(Material.valueOf(section.getString("material")));
+        CrispyItemStack itemStackBuilder = new CrispyItemStack(XMaterial.valueOf(section.getString("material")));
         itemStackBuilder.durability((short) section.getInt("data"));
         itemStackBuilder.amount(section.getInt("amount"));
         itemStackBuilder.glint(section.getBoolean("enchanted"));

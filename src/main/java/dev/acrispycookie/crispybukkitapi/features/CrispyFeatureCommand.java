@@ -1,19 +1,14 @@
 package dev.acrispycookie.crispybukkitapi.features;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
+import dev.acrispycookie.crispycommons.nms.wrappers.utilities.CommandRegister;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 
 public abstract class CrispyFeatureCommand<T extends CrispyFeature> extends BukkitCommand {
 
@@ -55,38 +50,7 @@ public abstract class CrispyFeatureCommand<T extends CrispyFeature> extends Bukk
     }
 
     protected void unregister() {
-        SimpleCommandMap map = ((CraftServer) api.getPlugin().getServer()).getCommandMap();
-        Field knownCommandsField = getField(SimpleCommandMap.class, "knownCommands");
-        Map<String, Command> knownCommands = getCommandMap(knownCommandsField, map);
-        knownCommands.remove(api.getPlugin().getName().toLowerCase() + ":" + getLabel());
-        knownCommands.remove(getLabel());
+        SimpleCommandMap map = CommandRegister.newInstance().unregister(api.getPlugin(), getLabel());
         this.unregister(map);
-        try {
-            knownCommandsField.set(map, knownCommands);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Map<String, Command> getCommandMap(Field field, SimpleCommandMap map) {
-        try {
-            field.setAccessible(true);
-            return (Map<String, Command>) field.get(map);
-        } catch (IllegalAccessException e) {
-            return null;
-        }
-    }
-
-    private Field getField(Class<?> clazz, String fieldName) {
-        try {
-            return clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            Class<?> superClass = clazz.getSuperclass();
-            if (superClass != null) {
-                return getField(superClass, fieldName);
-            } else {
-                return null;
-            }
-        }
     }
 }

@@ -5,10 +5,10 @@ import dev.acrispycookie.crispybukkitapi.managers.ConfigManager;
 import dev.acrispycookie.crispybukkitapi.managers.DataManager;
 import dev.acrispycookie.crispybukkitapi.managers.LanguageManager;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.sql.structure.AbstractSqlDatabase;
+import dev.acrispycookie.crispycommons.nms.wrappers.utilities.CommandRegister;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
@@ -53,7 +53,7 @@ public abstract class CrispyFeature {
 
     private void loadCommands() {
         commandsToLoad().forEach(c -> {
-            ((CraftServer) api.getPlugin().getServer()).getCommandMap().register(api.getPlugin().getName(), c);
+            CommandRegister.newInstance().register(api.getPlugin(), api.getPlugin().getName(), c);
             commands.add(c);
         });
     }
