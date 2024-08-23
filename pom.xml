@@ -72,13 +72,7 @@
         </dependency>
         <dependency>
             <groupId>dev.acrispycookie</groupId>
-            <artifactId>crispycommons-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>dev.acrispycookie</groupId>
-            <artifactId>crispycommons-nms</artifactId>
+            <artifactId>crispycommons-dist</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

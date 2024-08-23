@@ -5,7 +5,7 @@ import dev.acrispycookie.crispybukkitapi.managers.ConfigManager;
 import dev.acrispycookie.crispybukkitapi.managers.DataManager;
 import dev.acrispycookie.crispybukkitapi.managers.LanguageManager;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.sql.structure.AbstractSqlDatabase;
-import dev.acrispycookie.crispycommons.nms.wrappers.utilities.CommandRegister;
+import dev.acrispycookie.crispycommons.nms.utilities.CommandRegister;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
