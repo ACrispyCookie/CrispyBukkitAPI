@@ -5,8 +5,10 @@ import dev.acrispycookie.crispybukkitapi.managers.ConfigManager;
 import dev.acrispycookie.crispybukkitapi.managers.DataManager;
 import dev.acrispycookie.crispybukkitapi.managers.LanguageManager;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.sql.structure.AbstractSqlDatabase;
+import dev.acrispycookie.crispycommons.CrispyCommons;
 import dev.acrispycookie.crispycommons.utility.nms.CommandRegister;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -139,28 +141,30 @@ public abstract class CrispyFeature {
             this.path = path;
         }
 
-        public TextComponent get() {
+        public Component get() {
             return api.getManager(LanguageManager.class).get(getName() + "." + path);
         }
 
-        public TextComponent get(HashMap<String, String> placeholders) {
+        public Component get(HashMap<String, String> placeholders) {
             return api.getManager(LanguageManager.class).get(getName() + "." + path, placeholders);
         }
 
         public void send(CommandSender recipient) {
-            recipient.sendMessage(get().getText());
+            Audience au = CrispyCommons.getBukkitAudiences().sender(recipient);
+            au.sendMessage(this::get);
         }
 
         public void send(Player recipient) {
-            recipient.spigot().sendMessage(get());
+            send((CommandSender) recipient);
         }
 
         public void send(CommandSender recipient, HashMap<String, String> placeholders) {
-            recipient.sendMessage(get(placeholders).getText());
+            Audience au = CrispyCommons.getBukkitAudiences().sender(recipient);
+            au.sendMessage(get(placeholders));
         }
 
         public void send(Player recipient, HashMap<String, String> placeholders) {
-            recipient.spigot().sendMessage(get(placeholders));
+            send((CommandSender) recipient, placeholders);
         }
 
     }

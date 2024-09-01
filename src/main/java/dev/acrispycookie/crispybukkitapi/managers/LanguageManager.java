@@ -2,9 +2,10 @@ package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 
@@ -39,35 +40,28 @@ public class LanguageManager extends BaseManager {
         yamlManager = null;
     }
 
-    public TextComponent get(String path) {
+    public Component get(String path) {
         if(!yamlManager.get().isConfigurationSection(path))
-            return new TextComponent(translate(buildListString(path)));
+            return LegacyComponentSerializer.legacySection().deserialize(translate(buildListString(path)));
         return buildComponent(path);
     }
 
-    public TextComponent get(String path, Map<String, String> placeholders) {
+    public Component get(String path, Map<String, String> placeholders) {
         if(!yamlManager.get().isConfigurationSection(path))
-            return new TextComponent(parsePlaceholders(translate(buildListString(path)), placeholders));
+            return LegacyComponentSerializer.legacySection().deserialize(parsePlaceholders(translate(buildListString(path)), placeholders));
         return buildComponent(path);
     }
 
-    private TextComponent buildComponent(String path) {
+    private Component buildComponent(String path) {
         path = addRootPath(path);
-        TextComponent component = new TextComponent(translate(buildListString(path + ".text")));
+        Component component = LegacyComponentSerializer.legacySection().deserialize(translate(buildListString(path + ".text")));
         if (yamlManager.get().contains(path + ".hover-text")) {
-            component.setHoverEvent(
-                    new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent[] { new TextComponent(translate(buildListString(path + ".hover-text"))) }
-                    )
-            );
+            component = component.hoverEvent(HoverEvent.showText(LegacyComponentSerializer.legacySection().deserialize(translate(buildListString(path + ".hover-text")))));
         }
         if(yamlManager.get().contains(path + ".click-action")) {
-            component.setClickEvent(
-                    new ClickEvent(
-                            ClickEvent.Action.valueOf(yamlManager.get().getString(path + ".click-action")),
-                            yamlManager.get().getString(path + ".click-data")
-                    )
+            component = component.clickEvent(ClickEvent.clickEvent(
+                    ClickEvent.Action.valueOf(yamlManager.get().getString(path + ".click-action")),
+                    yamlManager.get().getString(path + ".click-data"))
             );
         }
         return component;
