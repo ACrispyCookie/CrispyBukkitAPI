@@ -3,6 +3,7 @@ package dev.acrispycookie.crispybukkitapi.managers;
 import com.cryptomorin.xseries.XMaterial;
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.files.SpigotYamlFileManager;
+import dev.acrispycookie.crispybukkitapi.utility.DataType;
 import dev.acrispycookie.crispycommons.api.itemstack.CrispyHeadItem;
 import dev.acrispycookie.crispycommons.api.itemstack.CrispyItemStack;
 import dev.acrispycookie.crispycommons.implementations.itemstack.PlayerHeadItem;
@@ -189,23 +190,6 @@ public class ConfigManager extends BaseManager {
         }
         itemStackBuilder.lore(lore.substring(0, Math.max(lore.toString().length() - 1, 0)));
         return itemStackBuilder;
-    }
-
-    public enum DataType {
-        INTEGER,
-        LONG,
-        DOUBLE,
-        BOOLEAN,
-        STRING,
-        INTEGER_LIST,
-        LONG_LIST,
-        DOUBLE_LIST,
-        BOOLEAN_LIST,
-        STRING_LIST,
-        SECTION,
-        ITEM_BUILDER,
-        SKULL_BUILDER,
-        INVENTORY_BUILDER
     }
 
     public static class ConfigInfo {

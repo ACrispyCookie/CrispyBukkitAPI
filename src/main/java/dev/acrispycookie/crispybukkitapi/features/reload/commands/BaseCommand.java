@@ -22,8 +22,8 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
 
     @Override
     protected boolean runPlayer(Player player, String[] args) {
-        if(!player.hasPermission(feature.getPerm(BaseFeature.PermissionMap.RELOAD.path()))) {
-            feature.getMsg(BaseFeature.MessageMap.NO_PERMISSION.path()).send(player);
+        if(!player.hasPermission(feature.getPerm(BaseFeature.Permission.RELOAD))) {
+            feature.getMsg(BaseFeature.Message.NO_PERMISSION).send(player);
             return false;
         }
 
@@ -36,7 +36,7 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
     }
 
     protected boolean runImplemented(CommandSender sender, String[] args) {
-        feature.getMsg(BaseFeature.MessageMap.USAGE.path()).send(sender);
+        feature.getMsg(BaseFeature.Message.USAGE).send(sender);
         return false;
     }
 
@@ -57,14 +57,14 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
 
     private boolean runSpecific(CommandSender sender, String[] args, Action action) {
         if (args.length != 2) {
-            feature.getMsg(BaseFeature.MessageMap.USAGE.path()).send(sender);
+            feature.getMsg(BaseFeature.Message.USAGE).send(sender);
             return false;
         }
 
         FeatureManager manager = api.getManager(FeatureManager.class);
-        CrispyFeature feature = manager.getFeature(args[1]);
+        CrispyFeature<?, ?, ?> feature = manager.getFeature(args[1]);
         if (feature == null) {
-            this.feature.getMsg(BaseFeature.MessageMap.INVALID_FEATURE.path()).send(sender, new HashMap<String, String>() {{
+            this.feature.getMsg(BaseFeature.Message.INVALID_FEATURE).send(sender, new HashMap<String, String>() {{
                 put("%features%", manager.getEnabledFeatures().stream().map(CrispyFeature::getName).collect(Collectors.joining(", ")));
             }});
             return false;
@@ -82,18 +82,18 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
     private boolean runReload(CommandSender sender, String[] args) {
         if (args.length == 1) {
             boolean restartRequired = !api.reload();
-            feature.getMsg(BaseFeature.MessageMap.RELOADED.path()).send(sender);
+            feature.getMsg(BaseFeature.Message.RELOADED).send(sender);
             if(restartRequired)
-                feature.getMsg(BaseFeature.MessageMap.RESTART_REQUIRED.path()).send(sender);
+                feature.getMsg(BaseFeature.Message.RESTART_REQUIRED).send(sender);
             return true;
         }
 
         return runSpecific(sender, args, Action.RELOAD);
     }
 
-    private void enableSafe(CommandSender sender, CrispyFeature toEnable) {
+    private void enableSafe(CommandSender sender, CrispyFeature<?, ?, ?> toEnable) {
         if (toEnable.isEnabled()) {
-            feature.getMsg(BaseFeature.MessageMap.FEATURE_ALREADY_ENABLED.path()).send(sender, new HashMap<String, String>() {{
+            feature.getMsg(BaseFeature.Message.FEATURE_ALREADY_ENABLED).send(sender, new HashMap<String, String>() {{
                 put("%name%", toEnable.getName());
             }});
             return;
@@ -101,14 +101,14 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
 
         toEnable.setEnabled(true);
         toEnable.load();
-        feature.getMsg(BaseFeature.MessageMap.FEATURE_ENABLED.path()).send(sender, new HashMap<String, String>() {{
+        feature.getMsg(BaseFeature.Message.FEATURE_ENABLED).send(sender, new HashMap<String, String>() {{
             put("%name%", toEnable.getName());
         }});
     }
 
-    private void disableSafe(CommandSender sender, CrispyFeature toDisable) {
+    private void disableSafe(CommandSender sender, CrispyFeature<?, ?, ?> toDisable) {
         if (!toDisable.isEnabled()) {
-            feature.getMsg(BaseFeature.MessageMap.FEATURE_ALREADY_DISABLED.path()).send(sender, new HashMap<String, String>() {{
+            feature.getMsg(BaseFeature.Message.FEATURE_ALREADY_DISABLED).send(sender, new HashMap<String, String>() {{
                 put("%name%", toDisable.getName());
             }});
             return;
@@ -116,23 +116,23 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
 
         toDisable.setEnabled(false);
         toDisable.unload();
-        feature.getMsg(BaseFeature.MessageMap.FEATURE_DISABLED.path()).send(sender, new HashMap<String, String>() {{
+        feature.getMsg(BaseFeature.Message.FEATURE_DISABLED).send(sender, new HashMap<String, String>() {{
             put("%name%", toDisable.getName());
         }});
     }
 
-    private void reloadSafe(CommandSender sender, CrispyFeature toReload) {
+    private void reloadSafe(CommandSender sender, CrispyFeature<?, ?, ?> toReload) {
         if (!toReload.isEnabled()) {
             enableSafe(sender, toReload);
             return;
         }
 
         boolean restartRequired = !toReload.reload();
-        feature.getMsg(BaseFeature.MessageMap.FEATURE_RELOADED.path()).send(sender, new HashMap<String, String>() {{
+        feature.getMsg(BaseFeature.Message.FEATURE_RELOADED).send(sender, new HashMap<String, String>() {{
             put("%name%", toReload.getName());
         }});
         if (restartRequired)
-            feature.getMsg(BaseFeature.MessageMap.RESTART_REQUIRED.path()).send(sender);
+            feature.getMsg(BaseFeature.Message.RESTART_REQUIRED).send(sender);
     }
 
     @Override
@@ -166,6 +166,6 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
     enum Action {
         ENABLE,
         DISABLE,
-        RELOAD;
+        RELOAD
     }
 }

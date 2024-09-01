@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CrispyFeatureCommand<T extends CrispyFeature> extends BukkitCommand {
+public abstract class CrispyFeatureCommand<T extends CrispyFeature<?, ?, ?>> extends BukkitCommand {
 
     protected final CrispyBukkitAPI api;
     private final String name;

@@ -1,10 +1,11 @@
 package dev.acrispycookie.crispybukkitapi.features;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
+import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
+import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
 import dev.acrispycookie.crispybukkitapi.managers.ConfigManager;
-import dev.acrispycookie.crispybukkitapi.managers.DataManager;
 import dev.acrispycookie.crispybukkitapi.managers.LanguageManager;
-import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.sql.structure.AbstractSqlDatabase;
+import dev.acrispycookie.crispybukkitapi.utility.DataType;
 import dev.acrispycookie.crispycommons.CrispyCommons;
 import dev.acrispycookie.crispycommons.utility.nms.CommandRegister;
 import net.kyori.adventure.audience.Audience;
@@ -14,10 +15,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
-public abstract class CrispyFeature {
+public abstract class CrispyFeature<C extends DataOption, M extends PathOption, P extends PathOption> {
 
     private boolean enabled;
     private boolean loaded = false;
@@ -26,45 +29,21 @@ public abstract class CrispyFeature {
     private static final Set<String> loadedDependencies = new HashSet<>();
     protected final CrispyBukkitAPI api;
     public abstract String getName();
-    protected abstract void onLoad(Set<String> loadedDependencies);
+    protected abstract void onLoad();
     protected abstract boolean onReload();
     protected abstract void onUnload();
-    protected abstract Set<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad();
     protected abstract Set<String> getDependencies();
-    protected abstract Set<CrispyFeatureListener<? extends CrispyFeature>> listenersToLoad();
+    protected abstract Set<CrispyFeatureCommand<?>> commandsToLoad();
+    protected abstract Set<CrispyFeatureListener<?>> listenersToLoad();
 
     public CrispyFeature(CrispyBukkitAPI api) {
         this.api = api;
-        this.enabled = get(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class);
+        this.enabled = get("enabled", DataType.BOOLEAN, Boolean.class);
         this.commands = new HashSet<>();
         this.listeners = new HashSet<>();
         if (enabled) {
             load();
         }
-    }
-
-    private void loadCommands() {
-        commandsToLoad().forEach(c -> {
-            CommandRegister.newInstance().register(api.getPlugin(), api.getPlugin().getName(), c);
-            commands.add(c);
-        });
-    }
-
-    private void loadListeners() {
-        listenersToLoad().forEach(c -> {
-            Bukkit.getPluginManager().registerEvents(c, api.getPlugin());
-            listeners.add(c);
-        });
-    }
-
-    private Set<String> checkForDependencies() {
-        Set<String> missing = new HashSet<>();
-        for(String dep : getDependencies()) {
-            if(!Bukkit.getPluginManager().isPluginEnabled(dep)) {
-               missing.add(dep);
-            }
-        }
-        return missing;
     }
 
     public boolean load() {
@@ -76,7 +55,7 @@ public abstract class CrispyFeature {
                     "Couldn't load the feature \"" + getName() + "\" because the following dependencies are missing: " + String.join(", ", missingDeps));
             return false;
         }
-        onLoad(loadedDependencies);
+        onLoad();
         loadedDependencies.addAll(getDependencies());
         loadCommands();
         loadListeners();
@@ -100,7 +79,7 @@ public abstract class CrispyFeature {
     }
 
     public boolean reload() {
-        boolean newEnabled = get(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class);
+        boolean newEnabled = get("enabled", DataType.BOOLEAN, Boolean.class);
         if (!newEnabled) {
             if (enabled)
                 unload();
@@ -131,32 +110,29 @@ public abstract class CrispyFeature {
         return enabled;
     }
 
-    public boolean isLoaded() {
-        return loaded;
-    }
-
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        set(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class, enabled);
+        set("enabled", enabled);
     }
 
-    public <T> T get(FeatureOptionInfo info, Class<T> tClass) {
-        return new FeatureOption(info).get(tClass);
+    public <T> T get(C option, Class<T> tClass) {
+        return get(option.path(), option.type(), tClass);
     }
 
-    public <T> void set(FeatureOptionInfo info, Class<T> tClass, T value) {
-        new FeatureOption(info).set(tClass, value);
+    public void set(C option, Object value) {
+        set(option.path(), value);
     }
 
-    public String getPerm(String path) {
-        return new FeaturePermission(path).get();
+    public String getPerm(P option) {
+        return api.getManager(ConfigManager.class).getFromType(
+                api.getManager(ConfigManager.class).getDefault(),"features." + getName() + ".permissions." + option.path(),
+                DataType.STRING, String.class
+        );
     }
 
-    public FeatureMessage getMsg(String path) {
-        return new FeatureMessage(path);
+    public FeatureMessage getMsg(M option) {
+        return new FeatureMessage(option.path());
     }
-
-    public AbstractSqlDatabase getDb() { return api.getManager(DataManager.class).getDatabase(); }
 
     public Set<CrispyFeatureCommand<?>> getCommands() {
         return commands;
@@ -168,6 +144,47 @@ public abstract class CrispyFeature {
 
     public static Set<String> getLoadedDependencies() {
         return loadedDependencies;
+    }
+
+    private <T> T get(String path, DataType type, Class<T> tClass) {
+        return tClass.cast(api.getManager(ConfigManager.class).getFromType(
+                api.getManager(ConfigManager.class).getDefault(),
+                "features." + getName() + "." + path,
+                type,
+                tClass
+        ));
+    }
+
+    private void set(String path, Object value) {
+        api.getManager(ConfigManager.class).save(
+                api.getManager(ConfigManager.class).getDefault(),
+                "features." + getName() + "." + path,
+                value
+        );
+    }
+
+    private void loadCommands() {
+        commandsToLoad().forEach(c -> {
+            CommandRegister.newInstance().register(api.getPlugin(), api.getPlugin().getName(), c);
+            commands.add(c);
+        });
+    }
+
+    private void loadListeners() {
+        listenersToLoad().forEach(c -> {
+            Bukkit.getPluginManager().registerEvents(c, api.getPlugin());
+            listeners.add(c);
+        });
+    }
+
+    private Set<String> checkForDependencies() {
+        Set<String> missing = new HashSet<>();
+        for(String dep : getDependencies()) {
+            if(!Bukkit.getPluginManager().isPluginEnabled(dep)) {
+                missing.add(dep);
+            }
+        }
+        return missing;
     }
 
     public class FeatureMessage {
@@ -202,62 +219,5 @@ public abstract class CrispyFeature {
             send((CommandSender) recipient, placeholders);
         }
 
-    }
-
-    protected class FeaturePermission {
-        private final String path;
-        public FeaturePermission(String path) {
-            this.path = path;
-        }
-
-        public String get() {
-            return api.getManager(ConfigManager.class).getFromType(
-                    api.getManager(ConfigManager.class).getDefault(),"features." + getName() + ".permissions." + path,
-                    ConfigManager.DataType.STRING, String.class
-            );
-        }
-
-    }
-
-    protected class FeatureOption {
-        private final FeatureOptionInfo info;
-        public FeatureOption(FeatureOptionInfo info) {
-            this.info = info;
-        }
-
-        public <T> T get(Class<T> type) {
-            return type.cast(api.getManager(ConfigManager.class).getFromType(
-                    api.getManager(ConfigManager.class).getDefault(),
-                    "features." + getName() + "." + info.getPath(),
-                    info.getType(),
-                    type
-            ));
-        }
-
-        public <T> void set(Class<T> type, T value) {
-            api.getManager(ConfigManager.class).save(
-                    api.getManager(ConfigManager.class).getDefault(),
-                    "features." + getName() + "." + info.getPath(),
-                    value
-            );
-        }
-
-    }
-
-    public static class FeatureOptionInfo {
-        private final String path;
-        private final ConfigManager.DataType type;
-        public FeatureOptionInfo(String path, ConfigManager.DataType type) {
-            this.path = path;
-            this.type = type;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public ConfigManager.DataType getType() {
-            return type;
-        }
     }
 }

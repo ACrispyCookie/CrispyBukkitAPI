@@ -4,11 +4,14 @@ import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureListener;
+import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
+import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
 import dev.acrispycookie.crispybukkitapi.features.reload.commands.BaseCommand;
+import dev.acrispycookie.crispybukkitapi.utility.DataType;
 
 import java.util.*;
 
-public class BaseFeature extends CrispyFeature {
+public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.Message, BaseFeature.Permission> {
 
     public BaseFeature(CrispyBukkitAPI api) {
         super(api);
@@ -20,7 +23,7 @@ public class BaseFeature extends CrispyFeature {
     }
 
     @Override
-    protected void onLoad(Set<String> loadedDependencies) {
+    protected void onLoad() {
 
     }
 
@@ -35,7 +38,7 @@ public class BaseFeature extends CrispyFeature {
     }
 
     @Override
-    protected Set<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad() {
+    protected Set<CrispyFeatureCommand<?>> commandsToLoad() {
         return Collections.singleton(new BaseCommand(this, api));
     }
 
@@ -49,7 +52,28 @@ public class BaseFeature extends CrispyFeature {
         return new HashSet<>();
     }
 
-    public enum MessageMap {
+    public enum Option implements DataOption {
+        ENABLED("enabled", DataType.BOOLEAN);
+
+        private final String path;
+        private final DataType type;
+        Option(String path, DataType type) {
+            this.path = path;
+            this.type = type;
+        }
+
+        @Override
+        public String path() {
+            return path;
+        }
+
+        @Override
+        public DataType type() {
+            return type;
+        }
+    }
+
+    public enum Message implements PathOption {
         RELOADED("reloaded"),
         FEATURE_ENABLED("feature-enabled"),
         FEATURE_ALREADY_ENABLED("feature-already-enabled"),
@@ -62,7 +86,7 @@ public class BaseFeature extends CrispyFeature {
         NO_PERMISSION("no-permission");
 
         private final String path;
-        MessageMap(String path) {
+        Message(String path) {
             this.path = path;
         }
 
@@ -71,11 +95,11 @@ public class BaseFeature extends CrispyFeature {
         }
     }
 
-    public enum PermissionMap {
+    public enum Permission implements PathOption {
         RELOAD("reload");
 
         private final String path;
-        PermissionMap(String path) {
+        Permission(String path) {
             this.path = path;
         }
 
