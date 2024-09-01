@@ -48,6 +48,11 @@ public class ConfigManager extends BaseManager {
         return null;
     }
 
+    public void save(ConfigInfo config, String path, Object value) throws InvalidTypeException {
+        SpigotYamlFileManager fileManager = configs.get(config);
+        fileManager.set(path, value);
+    }
+
     public boolean hasPath(ConfigInfo config, String path) {
         return configs.get(config).get().contains(path);
     }

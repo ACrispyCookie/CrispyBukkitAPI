@@ -35,22 +35,28 @@ public class ReloadFeature extends CrispyFeature {
     }
 
     @Override
-    protected List<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad() {
-        return Collections.singletonList(new ReloadCommand(this, api));
+    protected Set<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad() {
+        return Collections.singleton(new ReloadCommand(this, api));
     }
 
     @Override
-    protected List<String> getDependencies() {
-        return new ArrayList<>();
+    protected Set<String> getDependencies() {
+        return new HashSet<>();
     }
 
     @Override
-    protected List<CrispyFeatureListener<?>> listenersToLoad() {
-        return new ArrayList<>();
+    protected Set<CrispyFeatureListener<?>> listenersToLoad() {
+        return new HashSet<>();
     }
 
     public enum MessageMap {
         RELOADED("reloaded"),
+        FEATURE_ENABLED("feature-enabled"),
+        FEATURE_ALREADY_ENABLED("feature-already-enabled"),
+        FEATURE_DISABLED("feature-disabled"),
+        FEATURE_ALREADY_DISABLED("feature-already-disabled"),
+        FEATURE_RELOADED("feature-reloaded"),
+        INVALID_FEATURE("invalid-feature"),
         USAGE("usage"),
         RESTART_REQUIRED("restart-required"),
         NO_PERMISSION("no-permission");

@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public abstract class DataFileManager {
 
-    private final JavaPlugin plugin;
+    protected final JavaPlugin plugin;
     private final String name;
     private final String directory;
     private File file;

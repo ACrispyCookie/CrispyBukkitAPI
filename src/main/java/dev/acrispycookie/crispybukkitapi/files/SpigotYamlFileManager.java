@@ -1,5 +1,6 @@
 package dev.acrispycookie.crispybukkitapi.files;
 
+import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,6 +19,15 @@ public class SpigotYamlFileManager extends DataFileManager {
 
     public YamlConfiguration get() {
         return yaml;
+    }
+
+    public void set(String path, Object value) {
+        yaml.set(path, value);
+        try {
+            yaml.save(getFile());
+        } catch (IOException e) {
+            CrispyLogger.printException(plugin, e, "Failed to save the config: " + getName());
+        }
     }
 
     public void reload() throws IOException, InvalidConfigurationException {

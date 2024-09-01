@@ -4,17 +4,18 @@ import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FeatureManager extends BaseManager {
 
-    private final ArrayList<CrispyFeature> features;
-    private final ArrayList<Class<? extends CrispyFeature>> toLoad;
+    private final Map<String, CrispyFeature> features;
+    private final Set<Class<? extends CrispyFeature>> toLoad;
 
     public FeatureManager(CrispyBukkitAPI api) {
         super(api);
-        this.features = new ArrayList<>();
-        this.toLoad = new ArrayList<>();
+        this.features = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        this.toLoad = new HashSet<>();
     }
 
     public void registerFeature(Class<? extends CrispyFeature> fClass) {
@@ -24,7 +25,8 @@ public class FeatureManager extends BaseManager {
     public void load() throws ManagerLoadException {
         for (Class<? extends CrispyFeature> fClass : toLoad) {
             try {
-                features.add((CrispyFeature) fClass.getConstructors()[0].newInstance(api));
+                CrispyFeature feature = (CrispyFeature) fClass.getConstructors()[0].newInstance(api);
+                features.put(feature.getName(), feature);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new ManagerLoadException(e);
             }
@@ -32,13 +34,17 @@ public class FeatureManager extends BaseManager {
     }
 
     public void unload() {
-        for (CrispyFeature f : features) {
+        for (CrispyFeature f : features.values()) {
             f.unload();
         }
     }
 
+    public CrispyFeature getFeature(String name) {
+        return features.get(name);
+    }
+
     public <T extends CrispyFeature> T getFeature(Class<T> tClass) {
-        for (CrispyFeature f : features) {
+        for (CrispyFeature f : features.values()) {
             if(tClass.equals(f.getClass())) {
                 return tClass.cast(f);
             }
@@ -46,30 +52,30 @@ public class FeatureManager extends BaseManager {
         return null;
     }
 
-    public int getEnabledFeatures() {
-        int count = 0;
-        for (CrispyFeature f : features) {
-            if(f.isEnabled())
-                count++;
-        }
-        return count;
+    public Set<CrispyFeature> getFeatures() {
+        return features.values().stream().collect(Collectors.toSet());
+    }
+
+    public Set<CrispyFeature> getEnabledFeatures() {
+        return features.values().stream().filter(CrispyFeature::isEnabled).collect(Collectors.toSet());
     }
 
     @Override
     public void reload() throws ManagerReloadException {
-        boolean restart = false;
-        for (CrispyFeature f : features) {
+        boolean success = true;
+        Set<CrispyFeature> enabledFeatures = features.values().stream().filter(CrispyFeature::isEnabled).collect(Collectors.toSet());
+        for (CrispyFeature f : enabledFeatures) {
             try {
-                if(f.reload() && !restart) {
-                    restart = true;
+                if(!f.reload() && success) {
+                    success = false;
                 }
             } catch (Exception e) {
                 throw new ManagerReloadException(e, true, true);
             }
         }
 
-        if(restart) {
-            throw new ManagerReloadException("", restart, false);
+        if(!success) {
+            throw new ManagerReloadException("", true, false);
         }
     }
 }

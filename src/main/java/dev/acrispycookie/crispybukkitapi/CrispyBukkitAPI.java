@@ -63,7 +63,7 @@ public final class CrispyBukkitAPI {
                 return;
             }
         }
-        CrispyLogger.log(plugin, Level.INFO, "Loaded plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
+        CrispyLogger.log(plugin, Level.INFO, "Loaded plugin with " + getManager(FeatureManager.class).getEnabledFeatures().size() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
     }
 
     public void stop() {
@@ -77,7 +77,7 @@ public final class CrispyBukkitAPI {
 
     public boolean reload() {
         beforeLoading = System.currentTimeMillis();
-        boolean restart = false;
+        boolean success = true;
         for (ManagerType t : ManagerType.values()) {
             try {
                 managers.get(t.getType()).reload();
@@ -89,15 +89,15 @@ public final class CrispyBukkitAPI {
                 }
                 if (e.requiresRestart()) {
                     CrispyLogger.log(plugin, Level.WARNING, "This manager requires restarting: " + t.name());
-                    if (!restart)
-                        restart = e.requiresRestart();
+                    if (success)
+                        success = !e.requiresRestart();
                 }
             }
         }
-        if(restart)
+        if(!success)
             CrispyLogger.log(plugin, Level.WARNING, "RESTART REQUIRED! One or more features need restarting after reloading!");
-        CrispyLogger.log(plugin, Level.INFO, "Finished reloading plugin with " + getManager(FeatureManager.class).getEnabledFeatures() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
-        return restart;
+        CrispyLogger.log(plugin, Level.INFO, "Finished reloading plugin with " + getManager(FeatureManager.class).getEnabledFeatures().size() + " features enabled! (" + (System.currentTimeMillis() - beforeLoading) + "ms)");
+        return success;
     }
 
     public JavaPlugin getPlugin() {

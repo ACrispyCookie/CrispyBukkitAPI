@@ -20,36 +20,26 @@ import java.util.logging.Level;
 public abstract class CrispyFeature {
 
     private boolean enabled;
-    private final ArrayList<CrispyFeatureCommand<?>> commands;
-    private final ArrayList<CrispyFeatureListener<?>> listeners;
+    private boolean loaded = false;
+    private final Set<CrispyFeatureCommand<?>> commands;
+    private final Set<CrispyFeatureListener<?>> listeners;
     private static final Set<String> loadedDependencies = new HashSet<>();
     protected final CrispyBukkitAPI api;
     public abstract String getName();
     protected abstract void onLoad(Set<String> loadedDependencies);
     protected abstract boolean onReload();
     protected abstract void onUnload();
-    protected abstract List<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad();
-    protected abstract List<String> getDependencies();
-    protected abstract List<CrispyFeatureListener<? extends CrispyFeature>> listenersToLoad();
+    protected abstract Set<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad();
+    protected abstract Set<String> getDependencies();
+    protected abstract Set<CrispyFeatureListener<? extends CrispyFeature>> listenersToLoad();
 
     public CrispyFeature(CrispyBukkitAPI api) {
         this.api = api;
         this.enabled = get(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class);
-        this.commands = new ArrayList<>();
-        this.listeners = new ArrayList<>();
+        this.commands = new HashSet<>();
+        this.listeners = new HashSet<>();
         if (enabled) {
-            ArrayList<String> missingDeps = checkForDependencies();
-            if(!missingDeps.isEmpty()) {
-                api.getPlugin().getLogger().log(Level.WARNING,
-                        "Couldn't load the feature \"" + getName() + "\" because the following dependencies are missing: " + String.join(", ", missingDeps));
-                return;
-            }
-            onLoad(loadedDependencies);
-            loadedDependencies.addAll(getDependencies());
-            loadCommands();
-            loadListeners();
-            api.getPlugin().getLogger().log(Level.INFO,
-                    "Loaded feature \"" + getName() + "\"!");
+            load();
         }
     }
 
@@ -67,8 +57,8 @@ public abstract class CrispyFeature {
         });
     }
 
-    private ArrayList<String> checkForDependencies() {
-        ArrayList<String> missing = new ArrayList<>();
+    private Set<String> checkForDependencies() {
+        Set<String> missing = new HashSet<>();
         for(String dep : getDependencies()) {
             if(!Bukkit.getPluginManager().isPluginEnabled(dep)) {
                missing.add(dep);
@@ -77,19 +67,50 @@ public abstract class CrispyFeature {
         return missing;
     }
 
+    public boolean load() {
+        if (loaded)
+            return true;
+        Set<String> missingDeps = checkForDependencies();
+        if(!missingDeps.isEmpty()) {
+            api.getPlugin().getLogger().log(Level.WARNING,
+                    "Couldn't load the feature \"" + getName() + "\" because the following dependencies are missing: " + String.join(", ", missingDeps));
+            return false;
+        }
+        onLoad(loadedDependencies);
+        loadedDependencies.addAll(getDependencies());
+        loadCommands();
+        loadListeners();
+        api.getPlugin().getLogger().log(Level.INFO,
+                "Loaded feature \"" + getName() + "\"!");
+        loaded = true;
+        return true;
+    }
+
     public void unload() {
+        if (!loaded)
+            return;
         commands.forEach(CrispyFeatureCommand::unregister);
         listeners.forEach(HandlerList::unregisterAll);
         commands.clear();
         listeners.clear();
         onUnload();
+        api.getPlugin().getLogger().log(Level.INFO,
+                "Unloaded feature \"" + getName() + "\"!");
+        loaded = false;
     }
 
     public boolean reload() {
-        this.enabled = get(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class);
-        if(!enabled) {
-            unload();
-            return false;
+        boolean newEnabled = get(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class);
+        if (!newEnabled) {
+            if (enabled)
+                unload();
+            enabled = false;
+            return true;
+        }
+
+        if (!enabled) {
+            enabled = true;
+            return load();
         }
 
         unload();
@@ -97,11 +118,12 @@ public abstract class CrispyFeature {
             loadCommands();
             loadListeners();
             api.getPlugin().getLogger().log(Level.INFO, "Feature \"" + getName() + "\" was reloaded successfully");
-            return false;
+            loaded = true;
+            return true;
         } else {
             unload();
             api.getPlugin().getLogger().log(Level.INFO, "Feature \"" + getName() + "\" needs a restart to be enabled again!");
-            return true;
+            return false;
         }
     }
 
@@ -109,8 +131,21 @@ public abstract class CrispyFeature {
         return enabled;
     }
 
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        set(new FeatureOptionInfo("enabled", ConfigManager.DataType.BOOLEAN), Boolean.class, enabled);
+    }
+
     public <T> T get(FeatureOptionInfo info, Class<T> tClass) {
         return new FeatureOption(info).get(tClass);
+    }
+
+    public <T> void set(FeatureOptionInfo info, Class<T> tClass, T value) {
+        new FeatureOption(info).set(tClass, value);
     }
 
     public String getPerm(String path) {
@@ -123,11 +158,11 @@ public abstract class CrispyFeature {
 
     public AbstractSqlDatabase getDb() { return api.getManager(DataManager.class).getDatabase(); }
 
-    public ArrayList<CrispyFeatureCommand<?>> getCommands() {
+    public Set<CrispyFeatureCommand<?>> getCommands() {
         return commands;
     }
 
-    public ArrayList<CrispyFeatureListener<?>> getListeners() {
+    public Set<CrispyFeatureListener<?>> getListeners() {
         return listeners;
     }
 
@@ -192,10 +227,19 @@ public abstract class CrispyFeature {
 
         public <T> T get(Class<T> type) {
             return type.cast(api.getManager(ConfigManager.class).getFromType(
-                    api.getManager(ConfigManager.class).getDefault(),"features." + getName() + "." + info.getPath(),
+                    api.getManager(ConfigManager.class).getDefault(),
+                    "features." + getName() + "." + info.getPath(),
                     info.getType(),
                     type
             ));
+        }
+
+        public <T> void set(Class<T> type, T value) {
+            api.getManager(ConfigManager.class).save(
+                    api.getManager(ConfigManager.class).getDefault(),
+                    "features." + getName() + "." + info.getPath(),
+                    value
+            );
         }
 
     }
