@@ -1,7 +1,7 @@
 package dev.acrispycookie.crispybukkitapi.features;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
-import dev.acrispycookie.crispycommons.nms.utilities.CommandRegister;
+import dev.acrispycookie.crispycommons.utility.nms.CommandRegister;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.command.defaults.BukkitCommand;
