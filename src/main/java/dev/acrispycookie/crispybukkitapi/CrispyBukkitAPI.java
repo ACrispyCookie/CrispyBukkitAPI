@@ -1,7 +1,7 @@
 package dev.acrispycookie.crispybukkitapi;
 
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
-import dev.acrispycookie.crispybukkitapi.features.reload.ReloadFeature;
+import dev.acrispycookie.crispybukkitapi.features.reload.BaseFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
 import dev.acrispycookie.crispycommons.CommonsSettings;
@@ -26,7 +26,7 @@ public final class CrispyBukkitAPI {
         beforeLoading = System.currentTimeMillis();
         CrispyCommons.init(plugin, settings);
         initManagers();
-        addFeature(ReloadFeature.class);
+        addFeature(BaseFeature.class);
     }
 
     public CrispyBukkitAPI disableConfig() {

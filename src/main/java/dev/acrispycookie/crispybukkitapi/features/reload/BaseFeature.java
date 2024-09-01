@@ -4,13 +4,13 @@ import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureListener;
-import dev.acrispycookie.crispybukkitapi.features.reload.commands.ReloadCommand;
+import dev.acrispycookie.crispybukkitapi.features.reload.commands.BaseCommand;
 
 import java.util.*;
 
-public class ReloadFeature extends CrispyFeature {
+public class BaseFeature extends CrispyFeature {
 
-    public ReloadFeature(CrispyBukkitAPI api) {
+    public BaseFeature(CrispyBukkitAPI api) {
         super(api);
     }
 
@@ -36,7 +36,7 @@ public class ReloadFeature extends CrispyFeature {
 
     @Override
     protected Set<CrispyFeatureCommand<? extends CrispyFeature>> commandsToLoad() {
-        return Collections.singleton(new ReloadCommand(this, api));
+        return Collections.singleton(new BaseCommand(this, api));
     }
 
     @Override
