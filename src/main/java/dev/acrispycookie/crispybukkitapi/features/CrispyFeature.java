@@ -32,6 +32,9 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
     protected abstract void onLoad();
     protected abstract boolean onReload();
     protected abstract void onUnload();
+    protected abstract Set<C> getOptions();
+    protected abstract Set<M> getMessages();
+    protected abstract Set<P> getPermissions();
     protected abstract Set<String> getDependencies();
     protected abstract Set<CrispyFeatureCommand<?>> commandsToLoad();
     protected abstract Set<CrispyFeatureListener<?>> listenersToLoad();
@@ -83,12 +86,12 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
         if (!newEnabled) {
             if (enabled)
                 unload();
-            enabled = false;
+            setEnabled(false);
             return true;
         }
 
         if (!enabled) {
-            enabled = true;
+            setEnabled(true);
             return load();
         }
 

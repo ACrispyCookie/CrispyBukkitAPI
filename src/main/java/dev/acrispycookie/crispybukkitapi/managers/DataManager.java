@@ -5,6 +5,7 @@ import dev.acrispycookie.crispybukkitapi.database.AbstractDatabase;
 import dev.acrispycookie.crispybukkitapi.database.Database;
 import dev.acrispycookie.crispybukkitapi.database.JsonDatabase;
 import dev.acrispycookie.crispybukkitapi.database.RemoteDatabase;
+import dev.acrispycookie.crispybukkitapi.utility.DataType;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseLoadData;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.StorageCredentials;
@@ -95,7 +96,7 @@ public class DataManager extends BaseManager {
     private String getOptionValue(DatabaseOption option) {
         return api.getManager(ConfigManager.class).getFromType(
                 api.getManager(ConfigManager.class).getDefault(),
-                "database." + option.getPath(), ConfigManager.DataType.STRING,
+                "database." + option.getPath(), DataType.STRING,
                 String.class
         );
     }

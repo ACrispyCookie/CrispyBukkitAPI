@@ -1,5 +1,6 @@
 package dev.acrispycookie.crispybukkitapi.features.reload;
 
+import com.google.common.collect.Sets;
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
@@ -50,6 +51,21 @@ public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.M
     @Override
     protected Set<CrispyFeatureListener<?>> listenersToLoad() {
         return new HashSet<>();
+    }
+
+    @Override
+    protected Set<Option> getOptions() {
+        return Sets.newHashSet(Option.values());
+    }
+
+    @Override
+    protected Set<Message> getMessages() {
+        return Sets.newHashSet(Message.values());
+    }
+
+    @Override
+    protected Set<Permission> getPermissions() {
+        return Sets.newHashSet(Permission.values());
     }
 
     public enum Option implements DataOption {
