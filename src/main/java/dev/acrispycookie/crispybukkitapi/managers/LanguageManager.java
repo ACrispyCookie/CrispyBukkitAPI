@@ -58,7 +58,7 @@ public class LanguageManager extends BaseManager {
         if (yamlManager.get().contains(path + ".hover-text")) {
             component = component.hoverEvent(HoverEvent.showText(LegacyComponentSerializer.legacySection().deserialize(translate(buildListString(path + ".hover-text")))));
         }
-        if(yamlManager.get().contains(path + ".click-action")) {
+        if(yamlManager.get().contains(path + ".click-action") && yamlManager.get().contains(path + ".click-data")) {
             component = component.clickEvent(ClickEvent.clickEvent(
                     ClickEvent.Action.valueOf(yamlManager.get().getString(path + ".click-action")),
                     yamlManager.get().getString(path + ".click-data"))

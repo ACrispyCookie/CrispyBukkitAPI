@@ -1,10 +1,10 @@
-package dev.acrispycookie.crispybukkitapi.features.reload.commands;
+package dev.acrispycookie.crispybukkitapi.features.base.commands;
 
 import com.google.common.collect.Sets;
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
-import dev.acrispycookie.crispybukkitapi.features.reload.BaseFeature;
+import dev.acrispycookie.crispybukkitapi.features.base.BaseFeature;
 import dev.acrispycookie.crispybukkitapi.managers.FeatureManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,7 +36,9 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
     }
 
     protected boolean runImplemented(CommandSender sender, String[] args) {
-        feature.getMsg(BaseFeature.Message.USAGE).send(sender);
+        feature.getMsg(BaseFeature.Message.USAGE).send(sender, new HashMap<String, String>() {{
+            put("%name%", api.getPlugin().getName());
+        }});
         return false;
     }
 
@@ -57,7 +59,9 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
 
     private boolean runSpecific(CommandSender sender, String[] args, Action action) {
         if (args.length != 2) {
-            feature.getMsg(BaseFeature.Message.USAGE).send(sender);
+            feature.getMsg(BaseFeature.Message.USAGE).send(sender, new HashMap<String, String>() {{
+                put("%name%", api.getPlugin().getName());
+            }});
             return false;
         }
 

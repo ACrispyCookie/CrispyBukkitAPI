@@ -3,8 +3,7 @@ package dev.acrispycookie.crispybukkitapi.files;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public abstract class DataFileManager {
 
@@ -28,12 +27,15 @@ public abstract class DataFileManager {
 
         File file = new File(plugin.getDataFolder() + "/", name);
         if (!file.exists()) {
-            plugin.saveResource(directory + name, false);
-            file = new File(plugin.getDataFolder() + "/" + directory, name);
-            file.renameTo(new File(plugin.getDataFolder() + "/", name));
-            file = new File(plugin.getDataFolder() + "/", name);
-            File folder = new File(plugin.getDataFolder() + "/" + directory);
-            folder.delete();
+            try {
+                InputStream stream = plugin.getResource(directory + name);
+                if (stream == null)
+                    return;
+                file.createNewFile();
+                writeToFile(stream, file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         this.file = file;
     }
@@ -52,5 +54,34 @@ public abstract class DataFileManager {
 
     public File getFile() {
         return file;
+    }
+
+    protected String getOriginalContent() {
+        try {
+            InputStream inputStream = plugin.getResource(directory + name);
+            if (inputStream == null)
+                return null;
+            StringBuilder stringBuilder = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line).append(System.lineSeparator());
+                }
+            }
+            return stringBuilder.toString();
+        } catch (IOException exception) {
+            System.out.println("Error converting an input stream to string");
+            return null;
+        }
+    }
+
+    private void writeToFile(InputStream inputStream, File file) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
     }
 }

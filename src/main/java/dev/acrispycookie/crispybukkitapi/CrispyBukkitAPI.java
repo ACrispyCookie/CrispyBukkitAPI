@@ -1,7 +1,7 @@
 package dev.acrispycookie.crispybukkitapi;
 
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
-import dev.acrispycookie.crispybukkitapi.features.reload.BaseFeature;
+import dev.acrispycookie.crispybukkitapi.features.base.BaseFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
 import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
 import dev.acrispycookie.crispycommons.CommonsSettings;
@@ -49,7 +49,7 @@ public final class CrispyBukkitAPI {
         return this;
     }
 
-    public CrispyBukkitAPI addFeature(Class<? extends CrispyFeature> feature) {
+    public CrispyBukkitAPI addFeature(Class<? extends CrispyFeature<?, ?, ?>> feature) {
         getManager(FeatureManager.class).registerFeature(feature);
         return this;
     }

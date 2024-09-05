@@ -1,4 +1,4 @@
-package dev.acrispycookie.crispybukkitapi.features.reload;
+package dev.acrispycookie.crispybukkitapi.features.base;
 
 import com.google.common.collect.Sets;
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
@@ -7,7 +7,7 @@ import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureListener;
 import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
 import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
-import dev.acrispycookie.crispybukkitapi.features.reload.commands.BaseCommand;
+import dev.acrispycookie.crispybukkitapi.features.base.commands.BaseCommand;
 import dev.acrispycookie.crispybukkitapi.utility.DataType;
 
 import java.util.*;

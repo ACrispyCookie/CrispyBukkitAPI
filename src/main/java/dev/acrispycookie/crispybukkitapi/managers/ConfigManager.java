@@ -7,14 +7,17 @@ import dev.acrispycookie.crispybukkitapi.utility.DataType;
 import dev.acrispycookie.crispycommons.api.itemstack.CrispyHeadItem;
 import dev.acrispycookie.crispycommons.api.itemstack.CrispyItemStack;
 import dev.acrispycookie.crispycommons.implementations.itemstack.PlayerHeadItem;
+import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.inventory.ItemFlag;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class ConfigManager extends BaseManager {
 
@@ -50,6 +53,13 @@ public class ConfigManager extends BaseManager {
     }
 
     public void save(ConfigInfo config, String path, Object value) throws InvalidTypeException {
+        if (value instanceof PlayerHeadItem) {
+            saveSkullItem(config, path, (PlayerHeadItem) value);
+            return;
+        } else if (value instanceof CrispyItemStack) {
+            saveItem(config, path, (CrispyItemStack) value);
+            return;
+        }
         SpigotYamlFileManager fileManager = configs.get(config);
         fileManager.set(path, value);
     }
@@ -70,7 +80,8 @@ public class ConfigManager extends BaseManager {
     public void load() throws ManagerLoadException {
         for(ConfigInfo info : toLoad) {
             try {
-                configs.put(info, new SpigotYamlFileManager(api.getPlugin(), info.getFile(), info.getDirectory()));
+                SpigotYamlFileManager manager = new SpigotYamlFileManager(api.getPlugin(), info.getFile(), info.getDirectory());
+                configs.put(info, manager);
             } catch (IOException | InvalidConfigurationException e) {
                 throw new ManagerLoadException(e);
             }
@@ -162,12 +173,20 @@ public class ConfigManager extends BaseManager {
             throw new InvalidTypeException("Value at " + path + " is not an item.");
 
         ConfigurationSection section = getSection(config, path);
-        CrispyItemStack itemStackBuilder = new CrispyItemStack(XMaterial.valueOf(section.getString("material")));
-        itemStackBuilder.durability((short) section.getInt("data"));
-        itemStackBuilder.amount(section.getInt("amount"));
-        itemStackBuilder.glint(section.getBoolean("enchanted"));
-        itemStackBuilder.name(section.getString("name"));
-        itemStackBuilder.hideAttributes(section.getBoolean("hide_attributes"));
+        CrispyItemStack itemStackBuilder = new CrispyItemStack(XMaterial.AIR);
+        if (section.contains("material"))
+            itemStackBuilder = new CrispyItemStack(XMaterial.valueOf(section.getString("material")));
+        if (section.contains("data"))
+            itemStackBuilder.durability((short) section.getInt("data"));
+        if (section.contains("amount"))
+            itemStackBuilder.amount(section.getInt("amount"));
+        if (section.contains("enchanted"))
+            itemStackBuilder.glint(section.getBoolean("enchanted"));
+        String name = section.getString("name");
+        if (name != null)
+            itemStackBuilder.name(name);
+        if (section.contains("hide_attributes"))
+            itemStackBuilder.hideAttributes(section.getBoolean("hide_attributes"));
         StringBuilder lore = new StringBuilder();
         for(String line : section.getStringList("lore")){
             lore.append(line).append("\n");
@@ -182,14 +201,40 @@ public class ConfigManager extends BaseManager {
 
         ConfigurationSection section = getSection(config, path);
         CrispyHeadItem itemStackBuilder = new PlayerHeadItem(UUID.fromString(section.getString("owner")));
-        itemStackBuilder.amount(section.getInt("amount"));
-        itemStackBuilder.name(section.getString("name"));
+        if (section.contains("amount"))
+            itemStackBuilder.amount(section.getInt("amount"));
+        String name = section.getString("name");
+        if (name != null)
+            itemStackBuilder.name(name);
         StringBuilder lore = new StringBuilder();
         for(String line : section.getStringList("lore")){
             lore.append(line).append("\n");
         }
         itemStackBuilder.lore(lore.substring(0, Math.max(lore.toString().length() - 1, 0)));
         return itemStackBuilder;
+    }
+
+    private void saveItem(ConfigInfo configInfo, String path, CrispyItemStack item) {
+        SpigotYamlFileManager yaml = configs.get(configInfo);
+        yaml.set(path + ".material", XMaterial.matchXMaterial(item.getType()));
+        yaml.set(path + ".amount", item.getAmount());
+        yaml.set(path + ".data", item.getData());
+        yaml.set(path + ".enchanted", !item.getEnchantments().isEmpty());
+        if (item.getItemMeta() != null) {
+            yaml.set(path + ".name", item.getItemMeta().getDisplayName());
+            yaml.set(path + ".lore", item.getItemMeta().getLore());
+            yaml.set(path + ".hide_attributes", item.getItemMeta().getItemFlags().contains(ItemFlag.HIDE_ATTRIBUTES));
+        }
+    }
+
+    private void saveSkullItem(ConfigInfo configInfo, String path, PlayerHeadItem item) {
+        SpigotYamlFileManager yaml = configs.get(configInfo);
+        yaml.set(path + ".owner", item.getUuid());
+        yaml.set(path + ".amount", item.getAmount());
+        if (item.getItemMeta() != null) {
+            yaml.set(path + ".name", item.getItemMeta().getDisplayName());
+            yaml.set(path + ".lore", item.getItemMeta().getLore());
+        }
     }
 
     public static class ConfigInfo {

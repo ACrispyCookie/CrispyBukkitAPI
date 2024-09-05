@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public abstract class CrispyFeatureCommand<T extends CrispyFeature<?, ?, ?>> ext
     }
 
     @Override
-    public boolean execute(CommandSender sender, String usage, String[] args) {
+    public boolean execute(@NotNull CommandSender sender, @NotNull String usage, String[] args) {
         if (sender instanceof Player) {
             return runPlayer((Player) sender, args);
         }
@@ -38,14 +39,14 @@ public abstract class CrispyFeatureCommand<T extends CrispyFeature<?, ?, ?>> ext
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, String[] args) {
         if (sender instanceof Player) {
             return getTabOptions((Player) sender, args);
         }
         return new ArrayList<>();
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 

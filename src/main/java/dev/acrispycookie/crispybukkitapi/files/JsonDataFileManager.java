@@ -9,7 +9,7 @@ import java.io.FileReader;
 
 public class JsonDataFileManager extends DataFileManager {
 
-    JsonObject json;
+    private final JsonObject json;
 
     public JsonDataFileManager(JavaPlugin plugin, String name, String directory) throws FileNotFoundException {
         super(plugin, name, directory);
