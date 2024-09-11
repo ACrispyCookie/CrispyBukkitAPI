@@ -75,6 +75,25 @@ public abstract class DataFileManager {
         }
     }
 
+    protected String getDefaultContent() {
+        try {
+            InputStream inputStream = plugin.getResource(directory + "default-" + name);
+            if (inputStream == null)
+                return null;
+            StringBuilder stringBuilder = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line).append(System.lineSeparator());
+                }
+            }
+            return stringBuilder.toString();
+        } catch (IOException exception) {
+            System.out.println("Error converting an input stream to string");
+            return null;
+        }
+    }
+
     private void writeToFile(InputStream inputStream, File file) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             byte[] buffer = new byte[1024];

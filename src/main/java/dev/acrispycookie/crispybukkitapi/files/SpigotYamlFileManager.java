@@ -17,7 +17,7 @@ public class SpigotYamlFileManager extends DataFileManager {
         super(plugin, name, directory);
         yaml = new YamlConfiguration();
         yaml.load(getFile());
-        missingFields = loadMissingFields();
+        missingFields = loadMissingFields() + loadDefaultFields();
         if (missingFields != 0)
             CrispyLogger.log(plugin, Level.WARNING, "Configuration \"" + name + "\" was missing " + missingFields + " field" + (missingFields != 1 ? "s!" : "!"));
         CrispyLogger.log(plugin, Level.INFO, "Loaded configuration \"" + name + "\"!");
@@ -51,6 +51,26 @@ public class SpigotYamlFileManager extends DataFileManager {
         try {
             YamlConfiguration original = new YamlConfiguration();
             original.loadFromString(getOriginalContent());
+            int count = 0;
+            for (String field : original.getKeys(true)) {
+                if (yaml.contains(field))
+                    continue;
+                set(field, original.get(field));
+                ++count;
+            }
+            return count;
+        } catch (InvalidConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int loadDefaultFields() {
+        try {
+            YamlConfiguration original = new YamlConfiguration();
+            String defaultContent = getDefaultContent();
+            if (defaultContent == null)
+                return 0;
+            original.loadFromString(defaultContent);
             int count = 0;
             for (String field : original.getKeys(true)) {
                 if (yaml.contains(field))

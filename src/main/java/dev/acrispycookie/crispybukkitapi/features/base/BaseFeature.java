@@ -23,7 +23,7 @@ public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.M
 
     @Override
     public String getName() {
-        return "reload";
+        return "base";
     }
 
     @Override

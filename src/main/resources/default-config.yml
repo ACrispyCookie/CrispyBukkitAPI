@@ -6,7 +6,7 @@ database:
   password: ""
   table-prefix: ""
 features:
-  reload:
+  base:
     enabled: true
     permissions:
       reload: test.reload
