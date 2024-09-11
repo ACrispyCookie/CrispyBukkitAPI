@@ -49,7 +49,7 @@ public final class CrispyBukkitAPI {
         return this;
     }
 
-    public CrispyBukkitAPI addFeature(Class<? extends CrispyFeature<?, ?, ?>> feature) {
+    public CrispyBukkitAPI addFeature(Class<? extends CrispyFeature<?, ?, ?, ?>> feature) {
         getManager(FeatureManager.class).registerFeature(feature);
         return this;
     }

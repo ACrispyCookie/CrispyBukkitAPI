@@ -5,14 +5,17 @@ import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureListener;
+import dev.acrispycookie.crispybukkitapi.features.base.commands.BaseCommand;
 import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
 import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
-import dev.acrispycookie.crispybukkitapi.features.base.commands.BaseCommand;
+import dev.acrispycookie.crispybukkitapi.features.options.PersistentOption;
 import dev.acrispycookie.crispybukkitapi.utility.DataType;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.Message, BaseFeature.Permission> {
+public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.Message, BaseFeature.Permission, BaseFeature.Data> {
 
     public BaseFeature(CrispyBukkitAPI api) {
         super(api);
@@ -66,6 +69,20 @@ public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.M
     @Override
     protected Set<Permission> getPermissions() {
         return Sets.newHashSet(Permission.values());
+    }
+
+    public enum Data implements PersistentOption {
+        ENABLED(BaseFeature.class);
+
+        private final Class<?> clazz;
+        Data(Class<?> clazz) {
+            this.clazz = clazz;
+        }
+
+        @Override
+        public Class<?> clazz() {
+            return clazz;
+        }
     }
 
     public enum Option implements DataOption {

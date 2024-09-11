@@ -66,7 +66,7 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
         }
 
         FeatureManager manager = api.getManager(FeatureManager.class);
-        CrispyFeature<?, ?, ?> feature = manager.getFeature(args[1]);
+        CrispyFeature<?, ?, ?, ?> feature = manager.getFeature(args[1]);
         if (feature == null) {
             this.feature.getMsg(BaseFeature.Message.INVALID_FEATURE).send(sender, new HashMap<String, String>() {{
                 put("%features%", manager.getEnabledFeatures().stream().map(CrispyFeature::getName).collect(Collectors.joining(", ")));
@@ -95,7 +95,7 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
         return runSpecific(sender, args, Action.RELOAD);
     }
 
-    private void enableSafe(CommandSender sender, CrispyFeature<?, ?, ?> toEnable) {
+    private void enableSafe(CommandSender sender, CrispyFeature<?, ?, ?, ?> toEnable) {
         if (toEnable.isEnabled()) {
             feature.getMsg(BaseFeature.Message.FEATURE_ALREADY_ENABLED).send(sender, new HashMap<String, String>() {{
                 put("%name%", toEnable.getName());
@@ -110,7 +110,7 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
         }});
     }
 
-    private void disableSafe(CommandSender sender, CrispyFeature<?, ?, ?> toDisable) {
+    private void disableSafe(CommandSender sender, CrispyFeature<?, ?, ?, ?> toDisable) {
         if (!toDisable.isEnabled()) {
             feature.getMsg(BaseFeature.Message.FEATURE_ALREADY_DISABLED).send(sender, new HashMap<String, String>() {{
                 put("%name%", toDisable.getName());
@@ -125,7 +125,7 @@ public class BaseCommand extends CrispyFeatureCommand<BaseFeature> {
         }});
     }
 
-    private void reloadSafe(CommandSender sender, CrispyFeature<?, ?, ?> toReload) {
+    private void reloadSafe(CommandSender sender, CrispyFeature<?, ?, ?, ?> toReload) {
         if (!toReload.isEnabled()) {
             enableSafe(sender, toReload);
             return;

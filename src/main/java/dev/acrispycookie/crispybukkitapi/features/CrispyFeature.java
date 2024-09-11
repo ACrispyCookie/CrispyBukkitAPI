@@ -3,10 +3,12 @@ package dev.acrispycookie.crispybukkitapi.features;
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
 import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
+import dev.acrispycookie.crispybukkitapi.features.options.PersistentOption;
 import dev.acrispycookie.crispybukkitapi.managers.ConfigManager;
 import dev.acrispycookie.crispybukkitapi.managers.LanguageManager;
 import dev.acrispycookie.crispybukkitapi.utility.DataType;
 import dev.acrispycookie.crispycommons.CrispyCommons;
+import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
 import dev.acrispycookie.crispycommons.utility.nms.CommandRegister;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -20,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
-public abstract class CrispyFeature<C extends DataOption, M extends PathOption, P extends PathOption> {
+public abstract class CrispyFeature<C extends DataOption, M extends PathOption, P extends PathOption, D extends PersistentOption> {
 
     private boolean enabled;
     private boolean loaded = false;
@@ -54,7 +56,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
             return true;
         Set<String> missingDeps = checkForDependencies();
         if(!missingDeps.isEmpty()) {
-            api.getPlugin().getLogger().log(Level.WARNING,
+            CrispyLogger.log(api.getPlugin(), Level.WARNING,
                     "Couldn't load the feature \"" + getName() + "\" because the following dependencies are missing: " + String.join(", ", missingDeps));
             return false;
         }
@@ -62,7 +64,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
         loadedDependencies.addAll(getDependencies());
         loadCommands();
         loadListeners();
-        api.getPlugin().getLogger().log(Level.INFO,
+        CrispyLogger.log(api.getPlugin(), Level.INFO,
                 "Loaded feature \"" + getName() + "\"!");
         loaded = true;
         return true;
@@ -76,7 +78,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
         commands.clear();
         listeners.clear();
         onUnload();
-        api.getPlugin().getLogger().log(Level.INFO,
+        CrispyLogger.log(api.getPlugin(), Level.INFO,
                 "Unloaded feature \"" + getName() + "\"!");
         loaded = false;
     }
@@ -99,12 +101,12 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
         if (onReload()) {
             loadCommands();
             loadListeners();
-            api.getPlugin().getLogger().log(Level.INFO, "Feature \"" + getName() + "\" was reloaded successfully");
+            CrispyLogger.log(api.getPlugin(), Level.INFO, "Feature \"" + getName() + "\" was reloaded successfully");
             loaded = true;
             return true;
         } else {
             unload();
-            api.getPlugin().getLogger().log(Level.INFO, "Feature \"" + getName() + "\" needs a restart to be enabled again!");
+            CrispyLogger.log(api.getPlugin(), Level.INFO, "Feature \"" + getName() + "\" needs a restart to be enabled again!");
             return false;
         }
     }
