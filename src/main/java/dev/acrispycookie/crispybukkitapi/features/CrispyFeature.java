@@ -47,7 +47,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends StringOption
 
     public CrispyFeature(CrispyBukkitAPI api) {
         this.api = api;
-        this.enabled = getCfg("enabled", DataType.BOOLEAN, Boolean.class);
+        this.enabled = getOption("enabled", DataType.BOOLEAN, Boolean.class);
         this.commands = new HashSet<>();
         this.listeners = new HashSet<>();
     }
@@ -87,7 +87,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends StringOption
     }
 
     public boolean reload() {
-        boolean newEnabled = getCfg("enabled", DataType.BOOLEAN, Boolean.class);
+        boolean newEnabled = getOption("enabled", DataType.BOOLEAN, Boolean.class);
         if (!newEnabled) {
             if (enabled)
                 unload();
@@ -120,25 +120,25 @@ public abstract class CrispyFeature<C extends DataOption, M extends StringOption
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        setCfg("enabled", enabled);
+        setOption("enabled", enabled);
     }
 
-    public <T> T getCfg(C option, Class<T> tClass) {
-        return getCfg(option.path(), option.type(), tClass);
+    public <T> T getOption(C option, Class<T> tClass) {
+        return getOption(option.path(), option.type(), tClass);
     }
 
-    public void setCfg(C option, Object value) {
-        setCfg(option.path(), value);
+    public void setOption(C option, Object value) {
+        setOption(option.path(), value);
     }
 
-    public String getPerm(P option) {
+    public String getPermission(P option) {
         return api.getManager(ConfigManager.class).getFromType(
                 api.getManager(ConfigManager.class).getDefault(),"features." + getName() + ".permissions." + option.path(),
                 DataType.STRING, String.class
         );
     }
 
-    public FeatureMessage getMsg(M option) {
+    public FeatureMessage getMessage(M option) {
         return new FeatureMessage(option.path());
     }
 
@@ -177,7 +177,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends StringOption
         return loadedDependencies;
     }
 
-    private <T> T getCfg(String path, DataType type, Class<T> tClass) {
+    private <T> T getOption(String path, DataType type, Class<T> tClass) {
         return tClass.cast(api.getManager(ConfigManager.class).getFromType(
                 api.getManager(ConfigManager.class).getDefault(),
                 "features." + getName() + "." + path,
@@ -186,7 +186,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends StringOption
         ));
     }
 
-    private void setCfg(String path, Object value) {
+    private void setOption(String path, Object value) {
         api.getManager(ConfigManager.class).save(
                 api.getManager(ConfigManager.class).getDefault(),
                 "features." + getName() + "." + path,
