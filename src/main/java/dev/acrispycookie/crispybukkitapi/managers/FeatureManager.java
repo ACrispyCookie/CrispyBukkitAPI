@@ -2,6 +2,7 @@ package dev.acrispycookie.crispybukkitapi.managers;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
+import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -10,26 +11,25 @@ import java.util.stream.Collectors;
 public class FeatureManager extends BaseManager {
 
     private final Map<String, CrispyFeature<?, ?, ?, ?>> features;
-    private final Set<Class<? extends CrispyFeature<?, ?, ?, ?>>> toLoad;
 
     public FeatureManager(CrispyBukkitAPI api) {
         super(api);
         this.features = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        this.toLoad = new HashSet<>();
     }
 
     public void registerFeature(Class<? extends CrispyFeature<?, ?, ?, ?>> fClass) {
-        toLoad.add(fClass);
+        try {
+            CrispyFeature<?, ?, ?, ?> feature = (CrispyFeature<?, ?, ?, ?>) fClass.getConstructors()[0].newInstance(api);
+            features.put(feature.getName(), feature);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            CrispyLogger.printException(api.getPlugin(), e, "Couldn't register the feature " + fClass.getSimpleName());
+        }
     }
 
     public void load() throws ManagerLoadException {
-        for (Class<? extends CrispyFeature<?, ?, ?, ?>> fClass : toLoad) {
-            try {
-                CrispyFeature<?, ?, ?, ?> feature = (CrispyFeature<?, ?, ?, ?>) fClass.getConstructors()[0].newInstance(api);
-                features.put(feature.getName(), feature);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new ManagerLoadException(e);
-            }
+        for (CrispyFeature<?, ?, ?, ?> feature : features.values()) {
+            if (!feature.load())
+                throw new ManagerLoadException("Couldn't load the feature " + feature.getName());
         }
     }
 

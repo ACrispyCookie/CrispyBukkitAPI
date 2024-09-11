@@ -2,9 +2,10 @@ package dev.acrispycookie.crispybukkitapi.features;
 
 import dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI;
 import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
-import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
 import dev.acrispycookie.crispybukkitapi.features.options.PersistentOption;
+import dev.acrispycookie.crispybukkitapi.features.options.StringOption;
 import dev.acrispycookie.crispybukkitapi.managers.ConfigManager;
+import dev.acrispycookie.crispybukkitapi.managers.DataManager;
 import dev.acrispycookie.crispybukkitapi.managers.LanguageManager;
 import dev.acrispycookie.crispybukkitapi.utility.DataType;
 import dev.acrispycookie.crispycommons.CrispyCommons;
@@ -16,13 +17,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
-public abstract class CrispyFeature<C extends DataOption, M extends PathOption, P extends PathOption, D extends PersistentOption> {
+public abstract class CrispyFeature<C extends DataOption, M extends StringOption, P extends StringOption, D extends PersistentOption> {
 
     private boolean enabled;
     private boolean loaded = false;
@@ -34,6 +37,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
     protected abstract void onLoad();
     protected abstract boolean onReload();
     protected abstract void onUnload();
+    public abstract Set<D> getData();
     protected abstract Set<C> getOptions();
     protected abstract Set<M> getMessages();
     protected abstract Set<P> getPermissions();
@@ -43,15 +47,14 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
 
     public CrispyFeature(CrispyBukkitAPI api) {
         this.api = api;
-        this.enabled = get("enabled", DataType.BOOLEAN, Boolean.class);
+        this.enabled = getCfg("enabled", DataType.BOOLEAN, Boolean.class);
         this.commands = new HashSet<>();
         this.listeners = new HashSet<>();
-        if (enabled) {
-            load();
-        }
     }
 
     public boolean load() {
+        if (!enabled)
+            return true;
         if (loaded)
             return true;
         Set<String> missingDeps = checkForDependencies();
@@ -84,7 +87,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
     }
 
     public boolean reload() {
-        boolean newEnabled = get("enabled", DataType.BOOLEAN, Boolean.class);
+        boolean newEnabled = getCfg("enabled", DataType.BOOLEAN, Boolean.class);
         if (!newEnabled) {
             if (enabled)
                 unload();
@@ -117,15 +120,15 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        set("enabled", enabled);
+        setCfg("enabled", enabled);
     }
 
-    public <T> T get(C option, Class<T> tClass) {
-        return get(option.path(), option.type(), tClass);
+    public <T> T getCfg(C option, Class<T> tClass) {
+        return getCfg(option.path(), option.type(), tClass);
     }
 
-    public void set(C option, Object value) {
-        set(option.path(), value);
+    public void setCfg(C option, Object value) {
+        setCfg(option.path(), value);
     }
 
     public String getPerm(P option) {
@@ -137,6 +140,29 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
 
     public FeatureMessage getMsg(M option) {
         return new FeatureMessage(option.path());
+    }
+
+    public Session getNewDataSession() {
+        return api.getManager(DataManager.class).newSession();
+    }
+
+    public Object getData(D option, Object id) {
+        return getData(option.clazz(), id);
+    }
+
+    public <T> T getData(Class<T> clazz, Object id) {
+        DataManager manager = api.getManager(DataManager.class);
+        Transaction transaction = null;
+        try (Session session = manager.newSession()) {
+            transaction = session.beginTransaction();
+            T toReturn = session.get(clazz, id);
+            transaction.commit();
+            return toReturn;
+        } catch (Exception e) {
+            if (transaction != null)
+                transaction.rollback();
+            throw new RuntimeException(e);
+        }
     }
 
     public Set<CrispyFeatureCommand<?>> getCommands() {
@@ -151,7 +177,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
         return loadedDependencies;
     }
 
-    private <T> T get(String path, DataType type, Class<T> tClass) {
+    private <T> T getCfg(String path, DataType type, Class<T> tClass) {
         return tClass.cast(api.getManager(ConfigManager.class).getFromType(
                 api.getManager(ConfigManager.class).getDefault(),
                 "features." + getName() + "." + path,
@@ -160,7 +186,7 @@ public abstract class CrispyFeature<C extends DataOption, M extends PathOption, 
         ));
     }
 
-    private void set(String path, Object value) {
+    private void setCfg(String path, Object value) {
         api.getManager(ConfigManager.class).save(
                 api.getManager(ConfigManager.class).getDefault(),
                 "features." + getName() + "." + path,

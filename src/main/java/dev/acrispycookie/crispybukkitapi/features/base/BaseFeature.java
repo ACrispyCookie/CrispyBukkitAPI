@@ -7,7 +7,7 @@ import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureCommand;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeatureListener;
 import dev.acrispycookie.crispybukkitapi.features.base.commands.BaseCommand;
 import dev.acrispycookie.crispybukkitapi.features.options.DataOption;
-import dev.acrispycookie.crispybukkitapi.features.options.PathOption;
+import dev.acrispycookie.crispybukkitapi.features.options.StringOption;
 import dev.acrispycookie.crispybukkitapi.features.options.PersistentOption;
 import dev.acrispycookie.crispybukkitapi.utility.DataType;
 
@@ -71,8 +71,13 @@ public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.M
         return Sets.newHashSet(Permission.values());
     }
 
+    @Override
+    public Set<Data> getData() {
+        return Sets.newHashSet(Data.values());
+    }
+
     public enum Data implements PersistentOption {
-        ENABLED(BaseFeature.class);
+        ;
 
         private final Class<?> clazz;
         Data(Class<?> clazz) {
@@ -106,7 +111,7 @@ public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.M
         }
     }
 
-    public enum Message implements PathOption {
+    public enum Message implements StringOption {
         RELOADED("reloaded"),
         FEATURE_ENABLED("feature-enabled"),
         FEATURE_ALREADY_ENABLED("feature-already-enabled"),
@@ -128,7 +133,7 @@ public class BaseFeature extends CrispyFeature<BaseFeature.Option, BaseFeature.M
         }
     }
 
-    public enum Permission implements PathOption {
+    public enum Permission implements StringOption {
         RELOAD("reload");
 
         private final String path;

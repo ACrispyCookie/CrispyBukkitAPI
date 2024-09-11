@@ -3,7 +3,6 @@ package dev.acrispycookie.crispybukkitapi;
 import dev.acrispycookie.crispybukkitapi.features.CrispyFeature;
 import dev.acrispycookie.crispybukkitapi.features.base.BaseFeature;
 import dev.acrispycookie.crispybukkitapi.managers.*;
-import dev.acrispycookie.crispybukkitapi.utils.database.sql.api.DatabaseSchema;
 import dev.acrispycookie.crispycommons.CommonsSettings;
 import dev.acrispycookie.crispycommons.CrispyCommons;
 import dev.acrispycookie.crispycommons.utility.logging.CrispyLogger;
@@ -41,11 +40,6 @@ public final class CrispyBukkitAPI {
 
     public CrispyBukkitAPI addConfig(ConfigManager.ConfigInfo info) {
         getManager(ConfigManager.class).addConfig(info);
-        return this;
-    }
-
-    public CrispyBukkitAPI setDatabaseSchema(DatabaseSchema schema) {
-        getManager(DataManager.class).setSchema(schema);
         return this;
     }
 

@@ -1,0 +1,12 @@
+database:
+  type: "mysql" #h2, mysql, postgresql,
+  host: ""
+  database: ""
+  username: ""
+  password: ""
+  table-prefix: ""
+features:
+  reload:
+    enabled: true
+    permissions:
+      reload: test.reload
