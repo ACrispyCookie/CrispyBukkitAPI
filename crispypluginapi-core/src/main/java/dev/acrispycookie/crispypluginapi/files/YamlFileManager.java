@@ -64,7 +64,7 @@ public class YamlFileManager extends DataFileManager {
 
     private int loadMissingFields() {
         try {
-            YamlDocument original = YamlDocument.create(getOriginalContent());
+            YamlDocument original = YamlDocument.create(getOriginalContent(), configSettings);
             int count = 0;
             for (Route field : original.getRoutes(true)) {
                 if (yaml.contains(field))
@@ -83,7 +83,7 @@ public class YamlFileManager extends DataFileManager {
             InputStream stream = getDefaultContent();
             if (stream == null)
                 return 0;
-            YamlDocument original = YamlDocument.create(stream);
+            YamlDocument original = YamlDocument.create(stream, configSettings);
             int count = 0;
             for (String field : original.getRoutesAsStrings(true)) {
                 if (yaml.contains(field) || shouldNotLoadDatabase(field))
