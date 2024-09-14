@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 public abstract class CrispyFeature<C extends ConfigurationOption, M extends StringOption, P extends StringOption, D extends PersistentOption> {
@@ -159,6 +160,22 @@ public abstract class CrispyFeature<C extends ConfigurationOption, M extends Str
                 transaction.rollback();
             CrispyLogger.printException(api.getPlugin(), e, "Couldn't complete a data transaction from the feature: " + getName());
             return false;
+        }
+    }
+
+    public <T> T commitDataTransaction(Function<Session, T> consumer) {
+        DataManager manager = api.getManager(DataManager.class);
+        Transaction transaction = null;
+        try (Session session = manager.newSession()) {
+            transaction = session.beginTransaction();
+            T toReturn = consumer.apply(session);
+            transaction.commit();
+            return toReturn;
+        } catch (Exception e) {
+            if (transaction != null)
+                transaction.rollback();
+            CrispyLogger.printException(api.getPlugin(), e, "Couldn't complete a data transaction from the feature: " + getName());
+            return null;
         }
     }
 
