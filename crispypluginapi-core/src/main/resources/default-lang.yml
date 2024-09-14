@@ -1,7 +1,7 @@
 features:
   base:
     no-permission: "&cNo permission!"
-    usage: "&a/%name% reload [feature]"
+    usage: "&a/%name% <enable/disable/reload> [feature]"
     reloaded: "&aPlugin reloaded successfully!"
     invalid-feature: "&cInvalid feature! Available features: %features%"
     error-occurred: "&cAn error occurred while trying to %action% this feature! See console for details!"
