@@ -1,6 +1,6 @@
 database:
   type: "mysql" #h2, mysql, postgresql,
-  host: "localhost"
+  host: "test"
   port: "3306"
   database: "test"
   username: "test"

@@ -33,6 +33,8 @@ public class DataManager extends BaseManager {
         if(!api.getManager(ConfigManager.class).hasDefault() || !api.getManager(ConfigManager.class).hasPath(
                 api.getManager(ConfigManager.class).getDefault(), "database"))
             return;
+        if(isConfigurationDefault())
+            throw new ManagerLoadException("Please configure the database settings in the config.yml file and restart the server.");
 
         try {
             initHibernate();
@@ -129,23 +131,37 @@ public class DataManager extends BaseManager {
         return "jdbc:mysql://" + host + ":" + port + "/" + database + "?createDatabaseIfNotExist=true&characterEncoding=utf8";
     }
 
+    private boolean isConfigurationDefault() {
+        for (DatabaseOption option : DatabaseOption.values()) {
+            if (!getOptionValue(option).equals(option.getDefaultValue()))
+                return false;
+        }
+        return true;
+    }
+
     private enum DatabaseOption {
-        TYPE("type"),
-        HOST("host"),
-        PORT("port"),
-        DATABASE("database"),
-        USERNAME("username"),
-        PASSWORD("password"),
-        TABLE_PREFIX("table-prefix");
+        TYPE("type", "mysql"),
+        HOST("host", "test"),
+        PORT("port", "3306"),
+        DATABASE("database", "test"),
+        USERNAME("username", "test"),
+        PASSWORD("password", "test"),
+        TABLE_PREFIX("table-prefix", "test");
 
         private final String path;
+        private final String defaultValue;
 
-        DatabaseOption(String path) {
+        DatabaseOption(String path, String defaultValue) {
             this.path = path;
+            this.defaultValue = defaultValue;
         }
 
         public String getPath() {
             return path;
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
         }
     }
 }
