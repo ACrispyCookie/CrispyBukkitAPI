@@ -1,0 +1,13 @@
+database:
+  type: "mysql" #h2, mysql, postgresql,
+  host: "localhost"
+  port: "3306"
+  database: "test"
+  username: "test"
+  password: "test"
+  table-prefix: "test"
+features:
+  base:
+    enabled: true
+    permissions:
+      reload: test.reload

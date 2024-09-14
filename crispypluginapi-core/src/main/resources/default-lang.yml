@@ -1,0 +1,13 @@
+features:
+  base:
+    no-permission: "&cNo permission!"
+    usage: "&a/%name% reload [feature]"
+    reloaded: "&aPlugin reloaded successfully!"
+    invalid-feature: "&cInvalid feature! Available features: %features%"
+    error-occurred: "&cAn error occurred while trying to %action% this feature! See console for details!"
+    restart-required: "&cRestart is required! See console for details!"
+    feature-reloaded: "&aFeature '%name%' reloaded successfully!"
+    feature-enabled: "&aFeature '%name%' enabled successfully!"
+    feature-already-enabled: "&eFeature '%name%' is already enabled!"
+    feature-disabled: "&aFeature '%name%' disabled successfully!"
+    feature-already-disabled: "&eFeature '%name%' is already disabled!"
