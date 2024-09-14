@@ -11,8 +11,6 @@ import dev.acrispycookie.crispypluginapi.managers.DataManager;
 import dev.acrispycookie.crispypluginapi.managers.LanguageManager;
 import dev.acrispycookie.crispypluginapi.utility.AdapterPair;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
-import dev.dejvokep.boostedyaml.serialization.standard.StandardSerializer;
-import dev.dejvokep.boostedyaml.serialization.standard.TypeAdapter;
 import net.kyori.adventure.text.Component;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -21,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public abstract class CrispyFeature<C extends ConfigurationOption, M extends StringOption, P extends StringOption, D extends PersistentOption> {
@@ -147,8 +146,20 @@ public abstract class CrispyFeature<C extends ConfigurationOption, M extends Str
         }
     }
 
-    public Session getNewDataSession() {
-        return api.getManager(DataManager.class).newSession();
+    public boolean commitDataTransaction(Consumer<Session> consumer) {
+        DataManager manager = api.getManager(DataManager.class);
+        Transaction transaction = null;
+        try (Session session = manager.newSession()) {
+            transaction = session.beginTransaction();
+            consumer.accept(session);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null)
+                transaction.rollback();
+            CrispyLogger.printException(api.getPlugin(), e, "Couldn't complete a data transaction from the feature: " + getName());
+            return false;
+        }
     }
 
     public Set<? extends FeatureCommand<?>> getCommands() {
