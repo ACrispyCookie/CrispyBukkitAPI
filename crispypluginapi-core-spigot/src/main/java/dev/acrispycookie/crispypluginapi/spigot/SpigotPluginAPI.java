@@ -12,6 +12,7 @@ import dev.acrispycookie.crispypluginapi.CrispyPluginAPI;
 import dev.acrispycookie.crispypluginapi.features.CrispyFeature;
 import dev.acrispycookie.crispypluginapi.managers.ConfigManager;
 import dev.acrispycookie.crispypluginapi.spigot.features.base.BaseFeature;
+import dev.dejvokep.boostedyaml.settings.Settings;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -26,6 +27,11 @@ public class SpigotPluginAPI extends CrispyPluginAPI {
 
     public SpigotPluginAPI disableConfig() {
         super.disableConfig();
+        return this;
+    }
+
+    public SpigotPluginAPI setYamlSettings(Settings... settings) {
+        super.setYamlSettings(settings);
         return this;
     }
 
