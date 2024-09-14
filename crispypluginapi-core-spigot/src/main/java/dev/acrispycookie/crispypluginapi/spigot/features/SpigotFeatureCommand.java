@@ -5,7 +5,6 @@ import dev.acrispycookie.crispycommons.platform.player.PlatformCommandSender;
 import dev.acrispycookie.crispycommons.platform.player.PlatformPlayer;
 import dev.acrispycookie.crispycommons.platform.player.SpigotCommandSender;
 import dev.acrispycookie.crispycommons.platform.player.SpigotPlayer;
-import dev.acrispycookie.crispypluginapi.CrispyPluginAPI;
 import dev.acrispycookie.crispypluginapi.features.CrispyFeature;
 import dev.acrispycookie.crispypluginapi.features.FeatureCommand;
 import dev.acrispycookie.crispypluginapi.spigot.SpigotPluginAPI;
@@ -23,7 +22,7 @@ public abstract class SpigotFeatureCommand<T extends CrispyFeature<?, ?, ?, ?>> 
     protected abstract boolean runConsole(CommandSender sender, String[] args);
     protected abstract List<String> getTabOptions(Player sender, String[] args);
 
-    public SpigotFeatureCommand(T feature, CrispyPluginAPI api, String name, String description) {
+    public SpigotFeatureCommand(T feature, SpigotPluginAPI api, String name, String description) {
         super(feature, api, name, description);
         command = new BukkitCommand(name) {
             @Override
