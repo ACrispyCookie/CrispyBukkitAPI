@@ -1,5 +1,0 @@
-name: CrispyBukkitAPI
-version: '${project.version}'
-author: ACrispyCookie
-main: dev.acrispycookie.crispybukkitapi.CrispyBukkitAPI
-depend: []
