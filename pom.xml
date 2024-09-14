@@ -13,6 +13,7 @@
     <modules>
         <module>crispypluginapi-core</module>
         <module>crispypluginapi-core-spigot</module>
+        <module>crispypluginapi-spigot</module>
     </modules>
 
     <properties>
@@ -48,11 +49,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>2.3.232</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.3.0-jre</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
