@@ -7,7 +7,9 @@ import dev.acrispycookie.crispycommons.platform.CrispyPlugin;
 import dev.acrispycookie.crispycommons.platform.commands.PlatformCommand;
 import dev.acrispycookie.crispycommons.platform.commands.PlatformListener;
 import dev.acrispycookie.crispypluginapi.features.CrispyFeature;
+import dev.acrispycookie.crispypluginapi.files.YamlFileManager;
 import dev.acrispycookie.crispypluginapi.managers.*;
+import dev.dejvokep.boostedyaml.settings.Settings;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -31,6 +33,11 @@ public abstract class CrispyPluginAPI {
         this.beforeLoading = System.currentTimeMillis();
         this.commons = setupCrispyCommons(settings);
         initManagers();
+    }
+
+    public CrispyPluginAPI setYamlSettings(Settings... settings) {
+        YamlFileManager.setSettings(settings);
+        return this;
     }
 
     public CrispyPluginAPI disableConfig() {

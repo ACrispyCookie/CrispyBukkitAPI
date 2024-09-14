@@ -5,6 +5,7 @@ import dev.acrispycookie.crispypluginapi.CrispyPluginAPI;
 import dev.acrispycookie.crispypluginapi.managers.DataManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.route.Route;
+import dev.dejvokep.boostedyaml.settings.Settings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,10 +15,11 @@ public class YamlFileManager extends DataFileManager {
 
     private final YamlDocument yaml;
     private int missingFields;
+    private static Settings[] configSettings;
 
     public YamlFileManager(CrispyPluginAPI api, String name, String directory) throws IOException {
         super(api, name, directory);
-        yaml = YamlDocument.create(getFile());
+        yaml = YamlDocument.create(getFile(), configSettings);
         missingFields = loadDefaultFields() + loadMissingFields();
         if (missingFields != 0)
             CrispyLogger.log(api.getPlugin(), Level.WARNING, "Configuration \"" + name + "\" was missing " + missingFields + " field" + (missingFields != 1 ? "s!" : "!"));
@@ -54,6 +56,10 @@ public class YamlFileManager extends DataFileManager {
 
     public int getMissingFields() {
         return missingFields;
+    }
+
+    public static void setSettings(Settings... settings) {
+        configSettings = settings;
     }
 
     private int loadMissingFields() {
