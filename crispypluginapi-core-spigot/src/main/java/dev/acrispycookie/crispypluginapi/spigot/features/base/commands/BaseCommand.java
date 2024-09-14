@@ -38,7 +38,7 @@ public class BaseCommand extends SpigotFeatureCommand<BaseFeature> {
 
     protected boolean runImplemented(CommandSender sender, String[] args) {
         feature.getMessage(BaseFeature.Message.USAGE).send(sender, new HashMap<String, String>() {{
-            put("%name%", getApi().getPlugin().getName());
+            put("%name%", getApi().getPlugin().getName().toLowerCase());
         }});
         return false;
     }
@@ -61,7 +61,7 @@ public class BaseCommand extends SpigotFeatureCommand<BaseFeature> {
     private boolean runSpecific(CommandSender sender, String[] args, Action action) {
         if (args.length != 2) {
             feature.getMessage(BaseFeature.Message.USAGE).send(sender, new HashMap<String, String>() {{
-                put("%name%", getApi().getPlugin().getName());
+                put("%name%", getApi().getPlugin().getName().toLowerCase());
             }});
             return false;
         }
